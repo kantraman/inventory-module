@@ -23,10 +23,10 @@ const ItemSchema = new Schema({
         required: true
     },
     dimensions: {
-        type: String,
+        type: String
     },
     weight: {
-        type: Number
+        type: String
     },
     manufacturer: {
         type: String,
@@ -57,7 +57,6 @@ const ItemSchema = new Schema({
     },
     prefVendor: {
         type: String,
-        required: true
     },
     itemImg: {
         type: String,

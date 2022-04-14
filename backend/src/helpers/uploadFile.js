@@ -5,13 +5,14 @@ const express = require("express");
 const uploadFile = (req, res, next) => {
     try {
         const storage = multer.diskStorage({
-            destination: path.join(__dirname, "../public/", "uploads"),
+            destination: path.join(__dirname, "../../public/", "uploads"),
             filename: (req, file, cb) =>{   
                 // null as first argument means no error
                 cb(null, Date.now() + '-' + file.originalname )  
             }
         })
         let upload = multer({ storage: storage }).single("itemImg");
+        
         next();
         
     } catch (error) {

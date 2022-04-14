@@ -3,6 +3,7 @@ const Items = require("../model/Items");
 //Insert Item Group
 const insertItem = (req, res) => {
     try {
+        console.log(req.body);
         var item = {
             groupID: req.body.groupID,
             groupName: req.body.groupName,
@@ -20,7 +21,8 @@ const insertItem = (req, res) => {
             prefVendor: req.body.prefVendor,
             itemImg: req.file.filename
         }
-        if (item.groupName !== "" && item.itemName !== "") {
+        
+        if (item.groupName !== "" && item.itemName !== "" && item.itemName !== undefined) {
             const items = new Items(item);
             items.save()
                 .then(() => {
