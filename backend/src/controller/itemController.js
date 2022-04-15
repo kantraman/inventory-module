@@ -3,7 +3,6 @@ const Items = require("../model/Items");
 //Insert Item Group
 const insertItem = (req, res) => {
     try {
-        console.log(req.body);
         var item = {
             groupID: req.body.groupID,
             groupName: req.body.groupName,

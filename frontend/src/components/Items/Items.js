@@ -113,7 +113,7 @@ const Items = () => {
                 'x-access-token': token
             }
         });
-        console.log(response.data);//test
+        
         if (response.data.status === "Success") {
             setModalText({
                 header: "Item Group",
@@ -126,6 +126,7 @@ const Items = () => {
                 body: "An unexpected error occured. Please try again!"
             });
         }
+        setLoading(false);
         handleShow();
     }
 
@@ -224,6 +225,7 @@ const Items = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            <PreLoader loading={loading} />
         </Form>
     );
 };
