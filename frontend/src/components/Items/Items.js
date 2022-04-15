@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import useToken from '../Admin/useToken';
 import { Form, Row, Button, Modal } from 'react-bootstrap';
 import { validateItemEntry } from './validateItemEntry';
+import PreLoader from '../PreLoader';
 
 const Items = () => {
 
@@ -38,6 +39,9 @@ const Items = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    //To show preloader
+    const [loading, setLoading] = useState(true);
+
     //Load item groups
     const fetchItemGroups = async () => {
         const response = await axios.get("/api/inventory/item-groups", {
@@ -47,6 +51,7 @@ const Items = () => {
             }
         });
         setItemGroups(response.data);
+        setLoading(false);
     }
     
     useEffect(() => {
@@ -89,6 +94,7 @@ const Items = () => {
 
     //Posting form data to API
     const insertItem = async () => {
+        setLoading(true);
         const formData = new FormData();
         formData.append("itemName", postValues.itemName);
         formData.append("groupName", postValues.groupName);
