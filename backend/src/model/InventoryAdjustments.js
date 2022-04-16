@@ -11,6 +11,10 @@ const InvAdjSchema = new Schema({
         required: true
     },
     adjMode: {
+        type: String,
+        required: true
+    },
+    quantity: {
         type: Number,
         required: true
     },
@@ -28,6 +32,14 @@ const InvAdjSchema = new Schema({
     },
     itemID: {
         type: Number,
+        required: true
+    },
+    itemName: {
+        type: String,
+        required: true
+    },
+    unit: {
+        type: String,
         required: true
     }
 });

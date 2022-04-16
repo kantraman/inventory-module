@@ -4,9 +4,10 @@ import useToken from '../Admin/useToken';
 import { Form, Row, Button, Modal } from 'react-bootstrap';
 import { validateItemEntry } from './validateItemEntry';
 import PreLoader from '../PreLoader';
+import { getItemGroups } from './loadItems';
+import Logout from '../Admin/logout';
 
 const Items = () => {
-
     const initValues = {
         groupID: "",
         groupName: "",
@@ -44,14 +45,9 @@ const Items = () => {
 
     //Load item groups
     const fetchItemGroups = async () => {
-        const response = await axios.get("/api/inventory/item-groups", {
-            headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': token
-            }
-        });
-        setItemGroups(response.data);
-        setLoading(false);
+        const itemGroups = await getItemGroups(token);
+         setItemGroups(itemGroups);
+         setLoading(false);
     }
     
     useEffect(() => {
@@ -110,7 +106,8 @@ const Items = () => {
         formData.append("openingStock", postValues.openingStock);
         formData.append("reorderPoint", postValues.reorderPoint);
         formData.append("prefVendor", postValues.prefVendor);
-        formData.append("itemImg", postValues.itemImg, postValues.itemImg.fileName);
+        if(postValues.filepreview !== null)
+            formData.append("itemImg", postValues.itemImg, postValues.itemImg.fileName);
         
         const response = await axios.post("/api/inventory/item",
             formData, {
@@ -119,11 +116,12 @@ const Items = () => {
                 'x-access-token': token
             }
         });
-        
+        if (response.status === 401)
+            Logout();
         if (response.data.status === "Success") {
             setModalText({
-                header: "Item Group",
-                body: "Item group successfully inserted"
+                header: "Item",
+                body: "Item successfully inserted"
             });
             setPostValues(initValues);
         } else {

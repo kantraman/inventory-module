@@ -8,12 +8,15 @@
   background-color:#495464;
   margin-top: 5px;
   color: white;
+  border-radius: 5px;
 }
 
 .cover{
   position:fixed;
-  height: 100%;
-  width: 100%;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
   background-color: wheat;
 }
 

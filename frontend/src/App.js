@@ -6,6 +6,7 @@ import Login from "./components/Admin/Login";
 import useToken from './components/Admin/useToken';
 import ItemGroup from "./components/Items/ItemGroup";
 import Items from "./components/Items/Items";
+import InventoryAdj from "./components/Items/InventoryAdj";
 
 function App() {
   const { token, setToken } = useToken();
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<Login setToken={setToken} />} />
         <Route path="/item-group" element={<ItemGroup />} />
         <Route path="/item" element={<Items />} />
+        <Route path="/inv-adjustment" element={<InventoryAdj />} />
       </Routes>
     </div>
   );

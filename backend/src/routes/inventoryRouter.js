@@ -6,8 +6,15 @@ const {
     getItemGroups
 } = require("../controller/itemGrpController");
 const {
-    insertItem
+    insertItem,
+    getItem,
+    getAllItems
 } = require("../controller/itemController");
+const {
+    insertInvAdj,
+    getInvAdjDatewise
+} = require("../controller/itemAdjController");
+
 
 const inventoryRouter = express.Router();
 
@@ -18,7 +25,6 @@ var storage = multer.diskStorage({
         callback(null, path.join(__dirname, "../../public/", "uploads"));
     },
     filename: function (request, file, callback) {
-        console.log(file);
         callback(null, Math.random().toString() + Date.now().toString() + "-" + file.originalname);
     }
 });
@@ -32,7 +38,11 @@ inventoryRouter.get("/item-groups", auth, async (req, res) => getItemGroups(req,
 
 //Items
 inventoryRouter.post("/item", auth, upload.single('itemImg'), (req, res) => insertItem(req, res));
+inventoryRouter.get("/item/:id", auth, async (req, res) => getItem(req, res));
+inventoryRouter.get("/allitems4group/:id", auth, async (req, res) => getAllItems(req, res));
 
-
+//Inventory Adjustment
+inventoryRouter.post("/inv-adj", auth, (req, res) => insertInvAdj(req, res));
+inventoryRouter.get("inv-adj-datewise", auth, async (req, res) => getInvAdjDatewise(req, res));
 
 module.exports = inventoryRouter;

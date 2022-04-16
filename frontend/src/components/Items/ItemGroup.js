@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import useToken from '../Admin/useToken';
 import { Form, Row, Button, Modal } from 'react-bootstrap';
+import Logout from '../Admin/logout';
 
 const ItemGroup = () => {
     const initValues = {
@@ -43,7 +44,8 @@ const ItemGroup = () => {
                 'x-access-token': token
             }
         });
-            
+        if (response.status === 401)
+           Logout();    
         if (response.data.status === "Success") {
             setModalText({
                 header: "Item Group",

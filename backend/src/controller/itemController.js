@@ -40,7 +40,50 @@ const insertItem = (req, res) => {
             res.json({ status: "Error", message: error.message });
     }
 };
+//Get details of a specific item
+const getItem =  async (req, res) => {
+    try {
+        let ID = req.params.id;
+        let projection = {
+            _id: 0,
+        };
+        let item = await Items.find({itemID: ID}, projection);
+        if (item.length > 0) {
+            res.json(item);
+        } else {
+            res.json({ status: "Error", message: "No records found" });
+        }
+        
+    } catch (error) {
+        if (!res.headersSent)
+            res.json({ status: "Error", message: error.message });
+    }
+}
+
+//Get details of all items of a specific group
+const getAllItems =  async (req, res) => {
+    try {
+        let ID = req.params.id;
+        let projection = {
+            _id: 0,
+        };
+        let item = await Items.find({groupID: ID}, projection);
+        if (item.length > 0) {
+            res.json(item);
+        } else {
+            res.json({ status: "Error", message: "No records found" });
+        }
+        
+    } catch (error) {
+        if (!res.headersSent)
+            res.json({ status: "Error", message: error.message });
+    }
+}
+
+
 
 module.exports = {
-    insertItem
+    insertItem,
+    getItem,
+    getAllItems
 };
