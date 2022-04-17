@@ -1,15 +1,30 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Login from "./components/Admin/Login";
 import useToken from './components/Admin/useToken';
 import ItemGroup from "./components/Items/ItemGroup";
 import Items from "./components/Items/Items";
 import InventoryAdj from "./components/Items/InventoryAdj";
+import NavBar from "./components/Navigation/NavBar";
+import Home from "./components/Navigation/Home";
+import Logout from "./components/Admin/logout";
 
 function App() {
   const { token, setToken } = useToken();
+  const [navBarVisible, setNavBarVisible] = useState(true);
+  const location = useLocation();
+  useEffect(() => {
+    switch (location.pathname) {
+      case "/":
+        setNavBarVisible(false);
+        break;
+      default:
+        if (!navBarVisible)
+          setNavBarVisible(true);
+    }
+  }, [location]);
   if (!token) {
     return (
       <div>
@@ -21,11 +36,14 @@ function App() {
   }
   return (
     <div>
+      <NavBar visible={navBarVisible}/>
       <Routes>
         <Route path="/" element={<Login setToken={setToken} />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/item-group" element={<ItemGroup />} />
         <Route path="/item" element={<Items />} />
         <Route path="/inv-adjustment" element={<InventoryAdj />} />
+        <Route path="/Logout" element={<Logout />} />
       </Routes>
     </div>
   );

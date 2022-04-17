@@ -27,7 +27,7 @@ function Login(props) {
             })
             if (res.data.token) {
                 props.setToken(res.data.token);
-                //navigate('/home', { replace: true });
+                navigate('/home', { replace: true });
             } else {
                 window.alert("Login Failed");
             }
