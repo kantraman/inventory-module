@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Offcanvas, Button, Nav, NavDropdown } from 'react-bootstrap';
+import "./NavBar.css";
 
 const NavBar = ({ visible }) => {
     const [show, setShow] = useState(false);
@@ -26,6 +27,10 @@ const NavBar = ({ visible }) => {
                             <NavDropdown.Item href="/item">Item</NavDropdown.Item>
                             <NavDropdown.Item href="/inv-adjustment">Inventory Adjustment</NavDropdown.Item>
                         </NavDropdown>
+                        <NavDropdown title="Sales" id="basic-nav-dropdown">
+                            <NavDropdown.Item href="/customer">Customer</NavDropdown.Item>
+                        </NavDropdown>
+                        
                         <Nav.Link href="/Logout">Log Out</Nav.Link>
                     </Nav>
                 </Offcanvas.Body>

@@ -24,6 +24,10 @@ const CustomerSchema = new Schema({
     },
     addressLine2: {
         type: String,
+        required: true
+    },
+    addressLine3: {
+        type: String,
     },
     city: {
         type: String,
@@ -57,7 +61,7 @@ const CustomerSchema = new Schema({
 });
 
 //Generate Customer ID
-ItemGrpSchema.pre("save", async function (next) {
+CustomerSchema.pre("save", async function (next) {
     try {
         if (this.isNew) {
             let total = await Customer.find().sort({ customerID: -1 }).limit(1);

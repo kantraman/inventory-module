@@ -34,6 +34,7 @@ const ItemSchema = new Schema({
     },
     brand:{
         type: String,
+        required: true
     },
     sellingPrice: {
         type: Number,

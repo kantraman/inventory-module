@@ -1,0 +1,14 @@
+.nav-link {
+    text-decoration: none;
+    color: #fff !important;
+    font-size: large;
+}
+
+.dropdown-item{
+    color: #fff;
+    border: 1px solid #fff;
+}
+
+.dropdown-menu{
+    background-color:#333333;
+}

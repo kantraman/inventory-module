@@ -9,6 +9,7 @@ const insertCustomer = (req, res) => {
             customerType: req.body.customerType,
             addressLine1: req.body.addressLine1,
             addressLine2: req.body.addressLine2,
+            addressLine3: req.body.addressLine3,
             city: req.body.city,
             state: req.body.state,
             pincode: req.body.pincode,
@@ -48,6 +49,7 @@ const updateCustomer = (req, res) => {
             customerType: req.body.customerType,
             addressLine1: req.body.addressLine1,
             addressLine2: req.body.addressLine2,
+            addressLine3: req.body.addressLine3,
             city: req.body.city,
             state: req.body.state,
             pincode: req.body.pincode,
@@ -57,9 +59,9 @@ const updateCustomer = (req, res) => {
             contactNo2: req.body.contactNo2,
             website: req.body.website
         };
-        if (updateItem.customerName !== "" && updateItem.customerName !== undefined) {
-            Customer.findByIdAndUpdate(customerId, updateItem)
-                .then((customer) => res.json(customer))
+        if (updateItem.customerName !== "" && updateItem.customerName !== undefined && customerId !== "") {
+            Customer.findOneAndUpdate({ customerID: customerId }, updateItem, null)
+                .then(res.json({status: "Success"}))
                 .catch((er) => {
                     if (!res.headersSent)
                         res.sendStatus(500).json({ status: "Error" });
@@ -82,6 +84,21 @@ const getCustomer = async (req, res) => {
         };
         let projection = {
             _id: 0,
+            "customerID": "$customerID",
+            "title": "$title",
+            "customerName": "$customerName",
+            "customerType": "$customerType",
+            addressLine1: "$addressLine1",
+            addressLine2: "$addressLine2",
+            addressLine3: "$addressLine3",
+            city: "$city",
+            state: "$state",
+            pincode: "$pincode",
+            country: "$country",
+            emailID: "$emailID",
+            contactNo1: "$contactNo1",
+            contactNo2: "$contactNo2",
+            website: "$website" 
         };
         if (customerID === "A")
             filter = {};

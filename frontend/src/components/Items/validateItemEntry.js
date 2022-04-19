@@ -7,6 +7,8 @@ export const validateItemEntry = (formValues) => {
         errors.groupID = "Item group is required";
     if (!formValues.manufacturer)
         errors.manufacturer = "Manufacturer is required";
+    if (!formValues.brand)
+        errors.manufacturer = "Brand is required";
     if (Number(formValues.sellingPrice) <= 0 || isNaN(formValues.sellingPrice))
         errors.sellingPrice = "Invalid selling price";
     if (Number(formValues.costPrice) <= 0 || isNaN(formValues.costPrice))
