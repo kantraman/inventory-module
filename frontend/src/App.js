@@ -11,6 +11,7 @@ import NavBar from "./components/Navigation/NavBar";
 import Home from "./components/Navigation/Home";
 import Logout from "./components/Admin/logout";
 import Customer from "./components/Sales/Customer";
+import SalesOrder from "./components/Sales/SalesOrder";
 
 function App() {
   const { token, setToken } = useToken();
@@ -46,6 +47,7 @@ function App() {
         <Route path="/inv-adjustment" element={<InventoryAdj />} />
         <Route path="/customer" element={<Customer />} />
         <Route path="/Logout" element={<Logout />} />
+        <Route path="/sales-order" element={<SalesOrder />} />
       </Routes>
     </div>
   );

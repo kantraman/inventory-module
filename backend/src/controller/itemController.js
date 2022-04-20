@@ -66,6 +66,20 @@ const getAllItems =  async (req, res) => {
         let ID = req.params.id;
         let projection = {
             _id: 0,
+            itemID: "$itemID",
+            itemName: "$itemName",
+            brand: "$brand",
+            sellingPrice: "$sellingPrice",
+            costPrice: "$costPrice",
+            descr: "$descr",
+            unit: "$unit",
+            dimensions: "$dimensions",
+            weight: "$weight",
+            manufacturer: "$manufacturer",
+            openingStock: "$openingStock",
+            reorderPoint: "$reorderPoint",
+            prefVendor: "$prefVendor",
+            itemImg: "$filename"
         };
         let item = await Items.find({groupID: ID}, projection);
         if (item.length > 0) {

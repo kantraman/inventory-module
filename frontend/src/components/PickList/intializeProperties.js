@@ -1,3 +1,4 @@
+import { getItemByGroups } from "../Items/loadItems";
 import { getCustomers } from "../Sales/loadDataSales";
 
 export const intializeCustomer = async (token) => {
@@ -13,6 +14,23 @@ export const intializeCustomer = async (token) => {
     }, {
         title: "Address Line 1",
         field: "addressLine1"
+    }]
+    return details;
+}
+
+export const intializeItems = async (groupID, token) => {
+    const details = {};
+    details.data = await getItemByGroups(token, groupID);
+    details.title = "ITEMS";
+    details.rowHeaders = ["ID", "Name", "Brand", "SP", "CP", "Descr.",
+        "Unit", "Dimensions", "Weight", "Manufacturer",
+        "Opening Stock", "Reorder Point", "Pref. Vendor"];
+    details.search = [{
+        title: "Name",
+        field: "itemName"
+    }, {
+        title: "Brand",
+        field: "brand"
     }]
     return details;
 }

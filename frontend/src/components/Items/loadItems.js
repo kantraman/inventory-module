@@ -40,5 +40,6 @@ export const getItemDetails = async (token, itemID) => {
         }
     });
     let items = handleResponse(response);
-    return items;
+    
+    return items[0];
 }
