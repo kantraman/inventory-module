@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Customer = require('./Customer');
 const Schema = mongoose.Schema;
 
 const SalesOrderSchema = new Schema({
@@ -37,11 +36,6 @@ SalesOrderSchema.pre("save", async function (next) {
         next(error)
     }
 })
-
-SalesOrderSchema.methods.getCustomerDetails = async function (cb) {
-    const custDetails = await Customer.find({ customerID: this.customerID }, cb);
-    return custDetails;
-}
 
 const SalesOrder = mongoose.model("salesorder", SalesOrderSchema);
 module.exports = SalesOrder;

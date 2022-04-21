@@ -20,7 +20,7 @@ salesRouter.get("/customer/:id", auth, (req, res) => getCustomer(req, res));
 
 //Sales Order
 salesRouter.post("/sales-order", auth, (req, res) => insertSalesOrder(req, res));
-salesRouter.post("/sales-order/:id/update", auth, (req, res) => updateSalesOrder(req, res));
-salesRouter.post("/sales-order/:id", auth, (req, res) => getSalesOrder(req, res));
+salesRouter.put("/sales-order/:id/update", auth, (req, res) => updateSalesOrder(req, res));
+salesRouter.get("/sales-order/:id", auth, (req, res) => getSalesOrder(req, res));
 
 module.exports = salesRouter;

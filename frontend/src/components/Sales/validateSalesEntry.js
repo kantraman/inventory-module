@@ -30,3 +30,18 @@ export const validateCustomerEntry = (formValues) => {
     
     return errors;
 }
+
+export const validateSalesOrder = (formValues) => {
+    const errors = {};
+
+    if (!formValues.customerID)
+        errors.customerName = "Customer details is required.";
+    if (!formValues.status)
+        errors.status = "Status is required.";
+    if (formValues.items.length === 0)
+        errors.items = "Select the items.";
+    if (!formValues.orderDate)
+        errors.orderDate = "Order date is required.";
+    
+    return errors;
+}
