@@ -94,9 +94,70 @@ const getSalesOrder = async (req, res) => {
     }
 }
 
+//Get Sales Orders for a period itemwise, brandwise
+const getSalesOrder4Period = async (req, res) => {
+    try {
+        let fromDate = new Date(req.query.fromDate);
+        let toDate = new Date(req.query.toDate);
+        let item = req.query.item;
+               
+        toDate.setDate(toDate.getDate() + 1);
+
+        const filter1 = {
+            orderDate: {
+                $gte: fromDate,
+                $lt: toDate
+            },
+        };
+        const filter2 = {
+            "items.itemID": Number(item)
+        }
+        const lookupQ = {
+            from: "customers",
+            localField: "customerID",
+            foreignField: "customerID",
+            as: "custDetails"
+        };
+        let salesOrder = "";
+        if (item && item !== undefined)
+            salesOrder = await SalesOrder
+                .aggregate()
+                .match(filter1)
+                .lookup(lookupQ)
+                .unwind({
+                    path: "$items",
+                    includeArrayIndex: 'string',
+                    preserveNullAndEmptyArrays: true
+                })
+                .match(filter2);
+        else
+            salesOrder = await SalesOrder
+            .aggregate()
+            .match(filter1)
+            .lookup(lookupQ)
+            .unwind({
+                path: "$items",
+                includeArrayIndex: 'string',
+                preserveNullAndEmptyArrays: true
+            })
+        console.log(salesOrder);
+        if (salesOrder.length > 0) {
+            res.json(salesOrder);
+        } else {
+            res.json({ status: "Error", message: "No records found" });
+        }
+
+    } catch (err) {
+        console.log(err);
+        if (!res.headersSent)
+            res.json({ status: "Error", message: err.message });
+    }
+}
+
 
 module.exports = {
     insertSalesOrder,
     updateSalesOrder,
-    getSalesOrder
+    getSalesOrder,
+    getSalesOrder4Period
 };

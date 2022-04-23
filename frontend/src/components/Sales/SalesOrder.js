@@ -169,6 +169,7 @@ const SalesOrder = () => {
                         <option value="Draft">Draft</option>
                         <option value="Confirmed">Confirmed</option>
                         <option value="Closed">Closed</option>
+                        <option value="Void">Void</option>
                     </Form.Select>
                     <Form.Text className="text-danger">{errorValues.status}</Form.Text>
                 </Form.Group>

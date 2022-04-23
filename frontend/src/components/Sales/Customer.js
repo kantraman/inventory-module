@@ -67,7 +67,6 @@ const Customer = () => {
     const loadCustDetails = async (customer) => {
         const custDetails = await getSpecificCustomer(customer[0], token);
         setPostValues(custDetails);
-        console.log(custDetails);
     }
 
     //Posting form data to API

@@ -94,7 +94,6 @@ const InventoryAdj = () => {
         } else {
             setPostValues({ ...postValues, [name]: value });
         }
-        console.log(postValues);
     }
 
 
@@ -128,7 +127,6 @@ const InventoryAdj = () => {
                 'x-access-token': token
             }
         });
-        console.log(response.data);
         if (response.status === 401)
             Logout();
         if (response.data.status === "Success") {
