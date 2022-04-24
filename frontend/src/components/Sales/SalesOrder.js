@@ -6,7 +6,7 @@ import Logout from '../Admin/logout';
 import { validateSalesOrder } from './validateSalesEntry';
 import PickList from '../PickList/PickList';
 import { intializeCustomer, intializeSalesOrder } from '../PickList/intializeProperties';
-import { getSalesOrderDetails, getSpecificCustomer } from './loadDataSales';
+import { getSalesOrderDetails, getSpecificCustomer, showSalesOrderForm } from './loadDataSales';
 import PreLoader from '../PreLoader';
 import ItemSelector from '../Items/ItemSelector';
 import {formatDate} from '../../utility'
@@ -154,7 +154,12 @@ const SalesOrder = () => {
                 &emsp;
                 <Form.Label>Select SalesOrder</Form.Label>
                 <PickList title={plSalesOrder.title} rowHeaders={plSalesOrder.rowHeaders} search={plSalesOrder.search}
-                        data={plSalesOrder.data} onSelect={loadSODetails} />
+                    data={plSalesOrder.data} onSelect={loadSODetails} />
+                &emsp;
+                {(postValues.salesOrderID)
+                    ? <Button variant="primary" onClick={() => showSalesOrderForm(token, postValues.salesOrderID) }>View Sales Order</Button>
+                    :""
+                }
             </div>
             <Row>
             <Form.Group className="col-md-6 mb-1" controlId="formOrderDate">

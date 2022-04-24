@@ -1,5 +1,6 @@
+const convertToPdf = require("../helpers/htmltopdf");
 const SalesOrder = require("../model/SalesOrder");
-const Customer = require("../model/Customer");
+const salesOrderForm = require("../reports/salesOrder");
 
 //Insert Sales Order
 const insertSalesOrder = (req, res) => {
@@ -140,7 +141,6 @@ const getSalesOrder4Period = async (req, res) => {
                 includeArrayIndex: 'string',
                 preserveNullAndEmptyArrays: true
             })
-        console.log(salesOrder);
         if (salesOrder.length > 0) {
             res.json(salesOrder);
         } else {
@@ -154,10 +154,41 @@ const getSalesOrder4Period = async (req, res) => {
     }
 }
 
+//Get sales order form 
+const getSalesOrderForm = async (req, res) => {
+    try {
+        let OrderID = req.params.id;
+        const lookupQ = {
+            from: "customers",
+            localField: "customerID",
+            foreignField: "customerID",
+            as: "custDetails"
+        };
+        let salesOrder = await SalesOrder
+            .aggregate()
+            .match({ salesOrderID: Number(OrderID) })
+            .lookup(lookupQ)
+            .sort({ orderDate: -1 });
+        
+        if (salesOrder.length > 0) {
+            const template = salesOrderForm(salesOrder[0]);
+            convertToPdf(template, "SalesOrder", res);
+        } else {
+            res.json({ status: "Error", message: "No records found" });
+        }
+        
+    } catch (error) {
+        console.log(error);
+        if (!res.headersSent)
+            res.json({ status: "Error", message: error.message });
+    }
+}
+
 
 module.exports = {
     insertSalesOrder,
     updateSalesOrder,
     getSalesOrder,
-    getSalesOrder4Period
+    getSalesOrder4Period,
+    getSalesOrderForm
 };

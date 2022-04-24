@@ -11,7 +11,7 @@ const handleResponse = (response) => {
 }
 
 export const getItemGroups = async (token) => {
-    const response = await axios.get("/api/inventory/item-groups", {
+    const response = await axios.get("/api/inventory/item-groups/A", {
         headers: {
             'Content-Type': 'application/json',
             'x-access-token': token
@@ -19,6 +19,17 @@ export const getItemGroups = async (token) => {
     });
     let items = handleResponse(response);
     return items;
+}
+
+export const getItemGroupByID = async (token, groupID) => {
+    const response = await axios.get(`/api/inventory/item-groups/${groupID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    return items[0];
 }
 
 export const getItemByGroups = async (token, groupID) => {

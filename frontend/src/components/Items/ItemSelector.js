@@ -12,6 +12,7 @@ const ItemSelector = ({
 }) => {
     const initValues = {
         groupID: "",
+        tax: 0,
         itemID: "",
         itemName: "",
         unit: "",
@@ -48,8 +49,8 @@ const ItemSelector = ({
         const itemDetails = await getItemDetails(token, item[0]);
         itemDetails.filepreview = "/uploads/" + itemDetails.itemImg;
         itemDetails.quantity = 0;
+        itemDetails.tax = itemGroups[itemDetails.groupID - 1]["tax"];
         setItemDetails(itemDetails)
-        
     }
 
     //To handle item group change
@@ -57,6 +58,7 @@ const ItemSelector = ({
         const { name, value } = event.target;
         let itemList = await intializeItems(value, token);
         setPlItems(itemList);
+        itemDetails.tax = itemGroups[Number(value) - 1]["tax"];
         setItemDetails({ ...itemDetails, [name]: value });
     }
 
@@ -82,8 +84,13 @@ const ItemSelector = ({
             itemID: itemDetails.itemID,
             itemName: itemDetails.itemName,
             price: Number(itemDetails[price]).toFixed(2),
+            tax: ((itemDetails[price] * itemDetails.tax)/100).toFixed(2),
             quantity: itemDetails.quantity,
-            total: (itemDetails[price] * itemDetails.quantity).toFixed(2)
+            total: (
+                (itemDetails[price] + (
+                    (itemDetails[price] * itemDetails.tax)/100))
+                * itemDetails.quantity
+            ).toFixed(2)
         }
         if (!itemDetails.itemID)
             blnValid = false;
@@ -147,6 +154,10 @@ const ItemSelector = ({
                         <Form.Control type="number" name="costPrice" value={itemDetails.costPrice} placeholder="Cost Price" disabled />
                     </Form.Group>
                 }
+                <Form.Group className="col-md-6 mb-3" controlId="formTax">
+                    <Form.Label>Tax %</Form.Label>
+                    <Form.Control type="number" name="tax" value={itemDetails.tax} placeholder="Tax %" disabled />
+                </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formItemImg">
                     <Form.Label>Item Image</Form.Label>
                     {itemDetails.filepreview !== null ?
@@ -163,25 +174,27 @@ const ItemSelector = ({
                 &emsp;
                 <Button variant="primary" onClick={deleteItem}>Delete</Button>
             </div>
-            <Table style={{ "whiteSpace": 'nowrap'}} hover variant="dark" responsive>
+            <Table style={{ "whiteSpace": 'nowrap' }} hover variant="dark" responsive>
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
+                        <th className="text-end">Price</th>
+                        <th className="text-end">Tax</th>
+                        <th className="text-end">Quantity</th>
+                        <th className="text-end">Total</th>
                     </tr>
                 </thead>
-                <tbody style={{ "cursor": 'pointer'}}>
+                <tbody style={{ "cursor": 'pointer' }}>
                     {postValues.items.map((item, index) => {
                         return (
                             <tr key={index} onClick={selectRow}>
                                 <td>{item.itemID}</td>
                                 <td>{item.itemName}</td>
-                                <td>{item.price}</td>
-                                <td>{item.quantity}</td>
-                                <td>{item.total}</td>
+                                <td className="text-end">{item.price}</td>
+                                <td className="text-end">{item.tax}</td>
+                                <td className="text-end">{item.quantity}</td>
+                                <td className="text-end">{item.total}</td>
                             </tr>
                         )
                     })}

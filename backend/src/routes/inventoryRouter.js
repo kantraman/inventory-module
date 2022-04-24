@@ -34,7 +34,7 @@ var upload = multer({ storage: storage });
 
 //Item Groups
 inventoryRouter.post("/item-group", auth, (req, res) => insertItemGroup(req, res));
-inventoryRouter.get("/item-groups", auth, async (req, res) => getItemGroups(req, res));
+inventoryRouter.get("/item-groups/:id", auth, async (req, res) => getItemGroups(req, res));
 
 //Items
 inventoryRouter.post("/item", auth, upload.single('itemImg'), (req, res) => insertItem(req, res));

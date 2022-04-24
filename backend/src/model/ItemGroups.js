@@ -9,6 +9,10 @@ const ItemGrpSchema = new Schema({
     groupName: {
         type: String,
         required: true
+    },
+    tax: {
+        type: Number,
+        required: true
     }
 });
 

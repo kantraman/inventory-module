@@ -176,6 +176,7 @@ const ShowDetails = ({ details }) => {
                         <th>Item ID</th>
                         <th>Item Name</th>
                         <th className="text-end">Price</th>
+                        <th className="text-end">Tax</th>
                         <th className="text-end">Quantity</th>
                         <th className="text-end">Total</th>
                     </tr>
@@ -193,6 +194,7 @@ const ShowDetails = ({ details }) => {
                                     <td>{item.items.itemID}</td>
                                     <td>{item.items.itemName}</td>
                                     <td className="text-end">{item.items.price}</td>
+                                    <td className="text-end">{item.items.tax}</td>
                                     <td className="text-end">{item.items.quantity}</td>
                                     <td className="text-end">{item.items.total}</td>
                                 </tr>

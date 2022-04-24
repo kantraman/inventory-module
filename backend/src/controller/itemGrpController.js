@@ -5,6 +5,7 @@ const insertItemGroup = (req, res) => {
     try {
         var item = {
             groupName: req.body.groupName,
+            tax: req.body.tax
         }
         if (item.groupName !== "" && item.groupName !== undefined) {
             const itemGrp = new ItemGroup(item);
@@ -32,9 +33,14 @@ const getItemGroups = async (req, res) => {
         let projection = {
             _id: 0,
             "Group Name": "$groupName",
-            "ID": "$groupID"
+            "ID": "$groupID",
+            "tax": "$tax"
         };
-        let itemGrp = await ItemGroup.find({}, projection);
+        let groupID = req.params.id;
+        let filter = { groupID: groupID };
+        if (groupID === "A")
+            filter = {}
+        let itemGrp = await ItemGroup.find(filter, projection);
         if (itemGrp.length > 0) {
             res.json(itemGrp);
         } else {

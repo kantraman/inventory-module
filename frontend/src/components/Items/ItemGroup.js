@@ -6,7 +6,8 @@ import Logout from '../Admin/logout';
 
 const ItemGroup = () => {
     const initValues = {
-        groupName: ""
+        groupName: "",
+        tax: "0.00"
     };
     const { token } = useToken();
     //Manage Form Field Values
@@ -28,16 +29,17 @@ const ItemGroup = () => {
     //Manage form submit
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (postValues.groupName !== "")
+        if (postValues.groupName !== "" && Number(postValues.tax) > 0)
             insertItemGroup();
     }
 
     //Posting form data to API
     const insertItemGroup = async () => {
         const groupName = postValues.groupName;
+        const tax = postValues.tax;
         
         const response = await axios.post("/api/inventory/item-group", {
-            groupName
+            groupName, tax
         }, {
             headers: {
                 'Content-Type': 'application/json',
@@ -68,6 +70,10 @@ const ItemGroup = () => {
                 <Form.Group className="col-md-6 mb-3" controlId="formGroupName">
                     <Form.Label>Group Name</Form.Label>
                     <Form.Control type="text" name="groupName" value={postValues.groupName} onChange={handleChange} placeholder="Group Name" />
+                </Form.Group>
+                <Form.Group className="col-md-6 mb-3" controlId="formGroupTax">
+                    <Form.Label>Tax %</Form.Label>
+                    <Form.Control type="text" name="tax" value={postValues.tax} onChange={handleChange} placeholder="Tax%" />
                 </Form.Group>
             </Row>
             <div className="mb-4">
