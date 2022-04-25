@@ -24,7 +24,7 @@ const SalesOrderSchema = new Schema({
     }
 });
 
-//Generate Customer ID
+//Generate Salesorder ID
 SalesOrderSchema.pre("save", async function (next) {
     try {
         if (this.isNew) {

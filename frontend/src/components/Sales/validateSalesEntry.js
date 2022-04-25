@@ -45,3 +45,38 @@ export const validateSalesOrder = (formValues) => {
     
     return errors;
 }
+
+export const validatePackage = (formValues) => {
+    const errors = {};
+
+    if (!formValues.customerID)
+        errors.customerName = "Customer details is required.";
+    if (!formValues.status)
+        errors.status = "Status is required.";
+    if (formValues.items.length === 0)
+        errors.items = "Select the items.";
+    if (!formValues.packageDate)
+        errors.packageDate = "Package date is required.";
+    
+    return errors;
+}
+
+export const validateDeliveryChallan = (formValues) => {
+    const errors = {};
+
+    if (!formValues.customerID)
+        errors.customerName = "Customer details is required.";
+    if (!formValues.status)
+        errors.status = "Status is required.";
+    if (!formValues.refNo)
+        errors.refNo = "Reference No. is required.";
+    if (formValues.items.length === 0)
+        errors.items = "Select the items.";
+    if (!formValues.challanDate)
+        errors.challanDate = "Delivery challan date is required.";
+    if (!formValues.challanType)
+        errors.challanType = "Challan type is required.";
+    
+    return errors;
+}
+

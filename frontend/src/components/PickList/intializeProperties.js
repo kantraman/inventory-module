@@ -1,5 +1,10 @@
 import { getItemByGroups } from "../Items/loadItems";
-import { getAllSalesOrders, getCustomers, getSalesOrders } from "../Sales/loadDataSales";
+import {
+    getAllSalesOrders,
+    getCustomers,
+    getAllPackages,
+    getAllDeliveryChallan
+} from "../Sales/loadDataSales";
 
 export const intializeCustomer = async (token) => {
     const details = {};
@@ -35,11 +40,41 @@ export const intializeItems = async (groupID, token) => {
     return details;
 }
 
-export const intializeSalesOrder = async (token) => {
+export const intializeSalesOrder = async (token, status="") => {
     const details = {};
-    details.data = await getAllSalesOrders(token);
+    details.data = await getAllSalesOrders(token, status);
     details.title = "SALES ORDERS";
     details.rowHeaders = ["ID", "Status", "Cust. ID", "Customer Name", "Address", "Order Date"];
+    details.search = [{
+        title: "Name",
+        field: "customerName"
+    }, {
+        title: "Address",
+        field: "addressLine1"
+    }]
+    return details;
+}
+
+export const intializePackage = async (token, status="") => {
+    const details = {};
+    details.data = await getAllPackages(token, status);
+    details.title = "PACKAGES";
+    details.rowHeaders = ["ID", "Status", "Pkg Date", "Cust. ID", "Customer Name", "Address", "SO ID"];
+    details.search = [{
+        title: "Name",
+        field: "customerName"
+    }, {
+        title: "Address",
+        field: "addressLine1"
+    }]
+    return details;
+}
+
+export const intializeDeliveryChallan = async (token, status="") => {
+    const details = {};
+    details.data = await getAllDeliveryChallan(token, status);
+    details.title = "DELIVERY CHALLANS";
+    details.rowHeaders = ["ID", "Status", "Date", "Type", "Cust. ID", "Customer Name", "Address"];
     details.search = [{
         title: "Name",
         field: "customerName"

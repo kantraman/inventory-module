@@ -46,7 +46,7 @@ export const getSalesOrderDetails = async (salesOrderID, token) => {
     return items[0];
 };
 
-export const getAllSalesOrders = async (token) => {
+export const getAllSalesOrders = async (token, status="") => {
     const allSalesOrders = [];
     const response = await axios.get("/api/sales/sales-order/A", {
         headers: {
@@ -65,7 +65,12 @@ export const getAllSalesOrders = async (token) => {
             addressLine1: item.custDetails[0].addressLine1,
             orderDate: item.orderDate.substring(0, 10)
         };
-        allSalesOrders.push(salesOrder);
+        if (status !== "") {
+            if (item.status === status)
+                allSalesOrders.push(salesOrder);
+        } else {
+            allSalesOrders.push(salesOrder);
+        }
     })
     
     return allSalesOrders;
@@ -92,4 +97,87 @@ export const showSalesOrderForm = async (token, salesOrderID) => {
         window.alert("An error occured while getting data.");
     }
             
+};
+
+export const getAllPackages = async (token, status="") => {
+    const allPackages = [];
+    const response = await axios.get("/api/sales/package/A", {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    items.forEach((item) => {
+        let packages = {
+            packageID: item.packageID,
+            status: item.status,
+            packageDate: item.packageDate.substring(0, 10),
+            customerID: item.customerID,
+            customerName: item.custDetails[0].customerName,
+            addressLine1: item.custDetails[0].addressLine1,
+            salesOrderID: item.salesOrderID
+        };
+        if (status !== "") {
+            if (item.status === status)
+                allPackages.push(packages);
+        } else {
+            allPackages.push(packages);
+        }
+    })
+    
+    return allPackages;
+};
+
+export const getPackageDetails = async (packageID, token) => {
+    const response = await axios.get(`/api/sales/package/${packageID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    return items[0];
+};
+
+export const getAllDeliveryChallan = async (token, status="") => {
+    const allChallans = [];
+    const response = await axios.get("/api/sales/challan/A", {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+  
+    items.forEach((item) => {
+        let challans = {
+            challanID: item.challanID,
+            status: item.status,
+            challanDate: item.challanDate.substring(0, 10),
+            challanType: item.challanType,
+            customerID: item.customerID,
+            customerName: item.custDetails[0].customerName,
+            addressLine1: item.custDetails[0].addressLine1,
+        };
+        if (status !== "") {
+            if (item.status === status)
+                allChallans.push(challans);
+        } else {
+            allChallans.push(challans);
+        }
+    })
+    
+    return allChallans;
+};
+
+export const getChallanDetails = async (challanID, token) => {
+    const response = await axios.get(`/api/sales/challan/${challanID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    return items[0];
 };

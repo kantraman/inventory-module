@@ -13,6 +13,8 @@ import Logout from "./components/Admin/logout";
 import Customer from "./components/Sales/Customer";
 import SalesOrder from "./components/Sales/SalesOrder";
 import SalesOrderDatewise from "./components/Sales/SalesOrderDatewise";
+import Package from "./components/Sales/Package";
+import DeliveryChallan from "./components/Sales/DeliveryChallan";
 
 function App() {
   const { token, setToken } = useToken();
@@ -50,6 +52,8 @@ function App() {
         <Route path="/Logout" element={<Logout />} />
         <Route path="/sales-order" element={<SalesOrder />} />
         <Route path="/view-so" element={<SalesOrderDatewise />} />
+        <Route path="/package" element={<Package />} />
+        <Route path="/challan" element={<DeliveryChallan />} />
       </Routes>
     </div>
   );

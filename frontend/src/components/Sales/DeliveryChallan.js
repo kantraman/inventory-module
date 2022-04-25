@@ -3,17 +3,19 @@ import React, { useEffect, useState } from 'react';
 import useToken from '../Admin/useToken';
 import { Form, Row, Button, Modal} from 'react-bootstrap';
 import Logout from '../Admin/logout';
-import { validateSalesOrder } from './validateSalesEntry';
+import { validateDeliveryChallan } from './validateSalesEntry';
 import PickList from '../PickList/PickList';
-import { intializeCustomer, intializeSalesOrder } from '../PickList/intializeProperties';
-import { getSalesOrderDetails, getSpecificCustomer, showSalesOrderForm } from './loadDataSales';
+import { intializeCustomer, intializeDeliveryChallan } from '../PickList/intializeProperties';
+import { getSpecificCustomer, getChallanDetails } from './loadDataSales';
 import PreLoader from '../PreLoader';
 import ItemSelector from '../Items/ItemSelector';
-import {formatDate} from '../../utility'
+import { formatDate } from '../../utility';
 
-const SalesOrder = () => {
+
+const DeliveryChallan = () => {
     const initValues = {
-        salesOrderID: "",
+        challanID: "",
+        refNo: "",
         customerID: "",
         title: "",
         customerName: "",
@@ -24,8 +26,9 @@ const SalesOrder = () => {
         state: "",
         pincode: "",
         country: "",
-        status: "",
-        orderDate: formatDate(new Date(Date.now()).toLocaleDateString("en-UK")),
+        status: "Draft",
+        challanDate: formatDate(new Date(Date.now()).toLocaleDateString("en-UK")),
+        challanType: "",
         items: []
     };
     const { token } = useToken();
@@ -43,7 +46,7 @@ const SalesOrder = () => {
 
     //Picklist properties
     const [plCustomerProps, setPlCustomerProps] = useState({});
-    const [plSalesOrder, setPlSalesOrder] = useState({});
+    const [plDelivery, setPlDelivery] = useState({});
     
     //To show preloader
     const [loading, setLoading] = useState(true);
@@ -51,8 +54,8 @@ const SalesOrder = () => {
     const loadPicklistProps = async (token) => {
         let customersList = await intializeCustomer(token);
         setPlCustomerProps(customersList);
-        let salesOrderList = await intializeSalesOrder(token);
-        setPlSalesOrder(salesOrderList);
+        let deliveryChallan = await intializeDeliveryChallan(token);
+        setPlDelivery(deliveryChallan)
         setLoading(false);
     }
     useEffect(() => loadPicklistProps(token), []);
@@ -66,10 +69,34 @@ const SalesOrder = () => {
     //Manage form submit
     const handleSubmit = (event) => {
         event.preventDefault();
-        let validationErrors = validateSalesOrder(postValues);
+        let validationErrors = validateDeliveryChallan(postValues);
         setErrorValues(validationErrors);
         if (Object.keys(validationErrors).length === 0)
-            insertSalesOrder();
+            insertChallan();
+    }
+
+    //Load Challan details
+    const loadChallanDetails = async (deliveryChallan) => {
+        const challan = await getChallanDetails(deliveryChallan[0], token);
+        const postData = {
+            challanID: challan.challanID,
+            refNo: challan.refNo,
+            customerID: challan.customerID,
+            title: challan.custDetails[0].title,
+            customerName: challan.custDetails[0].customerName,
+            addressLine1: challan.custDetails[0].addressLine1,
+            addressLine2: challan.custDetails[0].addressLine2,
+            addressLine3: challan.custDetails[0].addressLine3,
+            city: challan.custDetails[0].city,
+            state: challan.custDetails[0].state,
+            pincode: challan.custDetails[0].pincode,
+            country: challan.custDetails[0].country,
+            status: challan.status,
+            challanDate: challan.challanDate.substring(0, 10),
+            challanType: challan.challanType,
+            items: challan.items
+        };
+        setPostValues(postData);
     }
 
     //Load customer details
@@ -80,40 +107,20 @@ const SalesOrder = () => {
         setPostValues(postData);
     }
 
-    //Load sales order details
-    const loadSODetails = async (salesOrder) => {
-        const soDetails = await getSalesOrderDetails(salesOrder[0], token);
-        const postData = {
-            salesOrderID: soDetails.salesOrderID,
-            customerID: soDetails.customerID,
-            title: soDetails.custDetails[0].title,
-            customerName: soDetails.custDetails[0].customerName,
-            addressLine1: soDetails.custDetails[0].addressLine1,
-            addressLine2: soDetails.custDetails[0].addressLine2,
-            addressLine3: soDetails.custDetails[0].addressLine3,
-            city: soDetails.custDetails[0].city,
-            state: soDetails.custDetails[0].state,
-            pincode: soDetails.custDetails[0].pincode,
-            country: soDetails.custDetails[0].country,
-            status: soDetails.status,
-            orderDate: soDetails.orderDate.substring(0, 10),
-            items: soDetails.items
-        };
-        setPostValues(postData);
-    }
-
     //Posting form data to API
-    const insertSalesOrder = async () => {
-        const salesOrderID = postValues.salesOrderID;
+    const insertChallan = async () => {
+        const challanID = postValues.challanID;
+        const refNo = postValues.refNo;
         const customerID = postValues.customerID;
-        const orderDate = postValues.orderDate;
+        const challanType = postValues.challanType;
+        const challanDate = postValues.challanDate;
         const status = postValues.status;
         const items = postValues.items;
 
-        let apiURL = "/api/sales/sales-order";
+        let apiURL = "/api/sales/challan";
         var response = "";
         let formValues = {
-            customerID, orderDate, status, items
+            challanType, customerID, challanDate, refNo, status, items
         };
         let options = {
             headers: {
@@ -121,8 +128,8 @@ const SalesOrder = () => {
                 'x-access-token': token
             }
         }
-        if (salesOrderID !== "") {
-            apiURL = `/api/sales/sales-order/${salesOrderID}/update`;
+        if (challanID !== "") {
+            apiURL = `/api/sales/challan/${challanID}/update`;
             response = await axios.put(apiURL, formValues, options);
         } else {
             response = await axios.post(apiURL, formValues, options);
@@ -131,7 +138,7 @@ const SalesOrder = () => {
             Logout();
         if (response.data.status === "Success") {
             setModalText({
-                header: "Sales Order",
+                header: "Delivery Challan",
                 body: "Operation completed successfully"
             });
             setPostValues(initValues);
@@ -147,83 +154,93 @@ const SalesOrder = () => {
 
     return (
         <Form className="mx-auto col-lg-6 col-md-8 col-sm-10 p-3 formBg" onSubmit={handleSubmit}>
-            <PreLoader loading = { loading }/>
-            <div className="text-center fs-1 mb-1 formHead">SALES ORDER</div>
+            <PreLoader loading={loading} />
+            <div className="text-center fs-1 mb-1 formHead">DELIVERY CHALLAN</div>
             <div className="d-flex flex-row align-items-baseline">
-                <Button variant="primary" onClick={() => setPostValues(initValues)}>New Sales Order</Button>
+                <Button variant="primary" onClick={() => setPostValues(initValues)}>New Challan</Button>
                 &emsp;
-                <Form.Label>Select SalesOrder</Form.Label>
-                <PickList title={plSalesOrder.title} rowHeaders={plSalesOrder.rowHeaders} search={plSalesOrder.search}
-                    data={plSalesOrder.data} onSelect={loadSODetails} />
-                &emsp;
-                {(postValues.salesOrderID)
-                    ? <Button variant="primary" onClick={() => showSalesOrderForm(token, postValues.salesOrderID) }>View Sales Order</Button>
-                    :""
-                }
+                <Form.Label>Select Challan</Form.Label>
+                <PickList title={plDelivery.title} rowHeaders={plDelivery.rowHeaders} search={plDelivery.search}
+                    data={plDelivery.data} onSelect={loadChallanDetails} />
             </div>
             <Row>
-            <Form.Group className="col-md-6 mb-1" controlId="formOrderDate">
-                    <Form.Label>Order Date</Form.Label>
-                    <Form.Control type="date" name="orderDate" value={postValues.orderDate} onChange={handleChange} />
-                    <Form.Text className="text-danger">{errorValues.orderDate}</Form.Text>
+                <Form.Group className="col-md-6 mb-1" controlId="formPackageDate">
+                    <Form.Label>Challan Date</Form.Label>
+                    <Form.Control type="date" name="challanDate" value={postValues.challanDate} onChange={handleChange} />
+                    <Form.Text className="text-danger">{errorValues.challanDate}</Form.Text>
                 </Form.Group>
-            <Form.Group className="col-md-6 mb-1" controlId="formStatus">
+                <Form.Group className="col-md-6 mb-1" controlId="formRefNo">
+                    <Form.Label>Reference No.</Form.Label>
+                    <Form.Control type="text" name="refNo" value={postValues.refNo} onChange={handleChange} placeholder="Reference No."  />
+                    <Form.Text className="text-danger">{errorValues.refNo}</Form.Text>
+                </Form.Group>
+                <Form.Group className="col-md-6 mb-1" controlId="formStatus">
                     <Form.Label>Status</Form.Label>
                     <Form.Select name="status" value={postValues.status} onChange={handleChange} >
                         <option value="">--Select--</option>
                         <option value="Draft">Draft</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Closed">Closed</option>
-                        <option value="Void">Void</option>
+                        <option value="Open">Open</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Returned">Returned</option>
                     </Form.Select>
                     <Form.Text className="text-danger">{errorValues.status}</Form.Text>
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-1" controlId="formName">
+                <Form.Group className="col-md-6 mb-1" controlId="formType">
+                    <Form.Label>Type</Form.Label>
+                    <Form.Select name="challanType" value={postValues.challanType} onChange={handleChange} >
+                        <option value="">--Select--</option>
+                        <option value="Supply of goods on approval">Supply of goods on approval</option>
+                        <option value="Job Work">Job Work</option>
+                        <option value="Semi assembled goods">Semi assembled goods</option>
+                        <option value="Others">Others</option>
+                    </Form.Select>
+                    <Form.Text className="text-danger">{errorValues.challanType}</Form.Text>
+                </Form.Group>
+                <Form.Group>
                     <Form.Label>Select Customer</Form.Label>
                     <PickList title={plCustomerProps.title} rowHeaders={plCustomerProps.rowHeaders} search={plCustomerProps.search}
                         data={plCustomerProps.data} onSelect={loadCustDetails} />
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formName">
                     <Form.Label>Full Name</Form.Label>
-                    <Form.Control type="text" name="customerName" value={postValues.customerName} onChange={handleChange} placeholder="Customer Name" disabled/>
+                    <Form.Control type="text" name="customerName" value={postValues.customerName} onChange={handleChange} placeholder="Customer Name" disabled />
                     <Form.Text className="text-danger">{errorValues.customerName}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formAddressLine1">
                     <Form.Label>Address Line 1</Form.Label>
-                    <Form.Control type="text" name="addressLine1" value={postValues.addressLine1} onChange={handleChange} placeholder="Address Line 1" disabled/>
+                    <Form.Control type="text" name="addressLine1" value={postValues.addressLine1} onChange={handleChange} placeholder="Address Line 1" disabled />
                     <Form.Text className="text-danger">{errorValues.addressLine1}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formAddressLine2">
                     <Form.Label>Address Line 2</Form.Label>
-                    <Form.Control type="text" name="addressLine2" value={postValues.addressLine2} onChange={handleChange} placeholder="Address Line 2" disabled/>
+                    <Form.Control type="text" name="addressLine2" value={postValues.addressLine2} onChange={handleChange} placeholder="Address Line 2" disabled />
                     <Form.Text className="text-danger">{errorValues.addressLine2}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formAddressLine3">
                     <Form.Label>Address Line 3</Form.Label>
-                    <Form.Control type="text" name="addressLine3" value={postValues.addressLine3} onChange={handleChange} placeholder="Address Line 3" disabled/>
+                    <Form.Control type="text" name="addressLine3" value={postValues.addressLine3} onChange={handleChange} placeholder="Address Line 3" disabled />
                     <Form.Text className="text-danger">{errorValues.addressLine3}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formCity">
                     <Form.Label>City</Form.Label>
-                    <Form.Control type="text" name="city" value={postValues.city} onChange={handleChange} placeholder="City" disabled/>
+                    <Form.Control type="text" name="city" value={postValues.city} onChange={handleChange} placeholder="City" disabled />
                     <Form.Text className="text-danger">{errorValues.city}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formState">
                     <Form.Label>State</Form.Label>
-                    <Form.Control type="text" name="state" value={postValues.state} onChange={handleChange} placeholder="State" disabled/>
+                    <Form.Control type="text" name="state" value={postValues.state} onChange={handleChange} placeholder="State" disabled />
                     <Form.Text className="text-danger">{errorValues.state}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formCountry">
                     <Form.Label>Country</Form.Label>
-                    <Form.Control type="text" name="country" value={postValues.country} onChange={handleChange} placeholder="Country" disabled/>
+                    <Form.Control type="text" name="country" value={postValues.country} onChange={handleChange} placeholder="Country" disabled />
                     <Form.Text className="text-danger">{errorValues.country}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formPincode">
                     <Form.Label>Pin Code</Form.Label>
-                    <Form.Control type="number" name="pincode" value={postValues.pincode} onChange={handleChange} placeholder="Pin Code" disabled/>
+                    <Form.Control type="number" name="pincode" value={postValues.pincode} onChange={handleChange} placeholder="Pin Code" disabled />
                     <Form.Text className="text-danger">{errorValues.pincode}</Form.Text>
                 </Form.Group>
-                
             </Row>
             <Form.Group className="mb-1" controlId="formItems">
                 <ItemSelector token={token} postValues={postValues} setPostValues={setPostValues} mode="S" />
@@ -247,4 +264,4 @@ const SalesOrder = () => {
     );
 };
 
-export default SalesOrder;
+export default DeliveryChallan;
