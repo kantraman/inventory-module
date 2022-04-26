@@ -90,7 +90,6 @@ const getDeliveryChallan = async (req, res) => {
         }
         
     } catch (error) {
-        console.log(error);
         if (!res.headersSent)
             res.json({ status: "Error", message: error.message });
     }

@@ -69,7 +69,7 @@ const Package = () => {
         event.preventDefault();
         let validationErrors = validatePackage(postValues);
         setErrorValues(validationErrors);
-        if (Object.keys(validationErrors).length === 0)
+        if (Object.keys(validationErrors).length === 0 && postValues.packageID !== "ND")
             insertPackage();
     }
 
@@ -93,10 +93,13 @@ const Package = () => {
             packageDate: itemPkg.packageDate.substring(0, 10),
             items: itemPkg.items
         };
-        if (postData.status !== "Not Shipped")
+        
+        if (postData.status !== "Not Shipped") {
             window.alert("Already shipped package cannot be edited.");
-        else
-            setPostValues(postData);
+            postData.packageID = "ND";
+        }
+        setPostValues(postData);
+            
     }
 
     //Load sales order details
@@ -188,6 +191,7 @@ const Package = () => {
                         <option value="Not Shipped">Not Shipped</option>
                         <option value="Shipped">Shipped</option>
                         <option value="Delivered">Delivered</option>
+                        <option value="Returned">Returned</option>
                     </Form.Select>
                     <Form.Text className="text-danger">{errorValues.status}</Form.Text>
                 </Form.Group>

@@ -181,3 +181,69 @@ export const getChallanDetails = async (challanID, token) => {
     let items = handleResponse(response);
     return items[0];
 };
+
+export const getAllInvoice = async (token, status="") => {
+    const allInvoices = [];
+    const response = await axios.get("/api/sales/invoice/A", {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+  
+    items.forEach((item) => {
+        let invoice = {
+            invoiceID: item.invoiceID,
+            status: item.status,
+            invoiceDate: item.invoiceDate.substring(0, 10),
+            dueDate: item.dueDate.substring(0, 10),
+            customerID: item.customerID,
+            customerName: item.custDetails[0].customerName,
+            addressLine1: item.custDetails[0].addressLine1,
+            salesOrderID: (item.salesOrderID === 0) ? "" : item.salesOrderID
+        };
+        if (status !== "") {
+            if (item.status === status)
+                allInvoices.push(invoice);
+        } else {
+            allInvoices.push(invoice);
+        }
+    })
+    
+    return allInvoices;
+};
+
+export const getInvoiceDetails = async (invoiceID, token) => {
+    const response = await axios.get(`/api/sales/invoice/${invoiceID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    return items[0];
+};
+
+export const showInvoiceForm = async (token, invoiceID) => {
+    const response = await axios.get(`/api/sales/view-invoice/${invoiceID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        },
+        responseType: 'blob',
+        timeout: 30000
+    });
+    if (response.headers["content-type"] === "application/pdf") {
+        const blob = await response.data;
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        URL.revokeObjectURL(url);
+    } else if (response.headers["content-type"] === "application/json") {
+        if (response.data.status)
+            window.alert(response.data.message);
+    } else {
+        window.alert("An error occured while getting data.");
+    }
+            
+};

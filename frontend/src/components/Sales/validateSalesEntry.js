@@ -80,3 +80,22 @@ export const validateDeliveryChallan = (formValues) => {
     return errors;
 }
 
+export const validateInvoice = (formValues) => {
+    const errors = {};
+
+    if (!formValues.customerID)
+        errors.customerName = "Customer details is required.";
+    if (!formValues.status)
+        errors.status = "Status is required.";
+    if (formValues.items.length === 0)
+        errors.items = "Select the items.";
+    if (!formValues.invoiceDate)
+        errors.invoiceDate = "Invoice date is required.";
+    if (!formValues.dueDate)
+        errors.invoiceDate = "Invoice due date is required.";
+    if (isNaN(formValues.otherCharges))
+        errors.challanType = "Invalid other charges";
+    
+    return errors;
+}
+

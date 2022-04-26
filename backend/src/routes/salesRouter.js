@@ -23,6 +23,12 @@ const {
     updateDeliveryChallan,
     getDeliveryChallan
 } = require("../controller/challanController");
+const {
+    insertInvoice,
+    updateInvoiceStatus,
+    getInvoice,
+    getInvoiceForm
+} = require("../controller/invoiceController");
 
 const salesRouter = express.Router();
 
@@ -48,5 +54,10 @@ salesRouter.post("/challan", auth, (req, res) => insertDeliveryChallan(req, res)
 salesRouter.put("/challan/:id/update", auth, (req, res) => updateDeliveryChallan(req, res));
 salesRouter.get("/challan/:id", auth, (req, res) => getDeliveryChallan(req, res));
 
+//Invoice
+salesRouter.post("/invoice", auth, (req, res) => insertInvoice(req, res));
+salesRouter.put("/invoice/:id/update", auth, (req, res) => updateInvoiceStatus(req, res));
+salesRouter.get("/invoice/:id", auth, (req, res) => getInvoice(req, res));
+salesRouter.get("/view-invoice/:id", auth, (req, res) => getInvoiceForm(req, res));
 
 module.exports = salesRouter;

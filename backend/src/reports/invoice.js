@@ -1,19 +1,21 @@
 const {numToEnglish} = require("../helpers/utility")
 
-const salesOrderForm = (salesOrder) => {
-    const title = "SALES ORDER";
-    const soID = salesOrder.salesOrderID;
-    const orderDate = salesOrder.orderDate;
-    const custName = salesOrder.custDetails[0].customerName;
-    const address1 = salesOrder.custDetails[0].addressLine1;
-    const address2 = salesOrder.custDetails[0].addressLine2;
-    const address3 = salesOrder.custDetails[0].addressLine3;
-    const city = salesOrder.custDetails[0].city;
-    const state = salesOrder.custDetails[0].state;
-    const country = salesOrder.custDetails[0].country;
-    const PIN = salesOrder.custDetails[0].pincode;
-    const phoneNo = salesOrder.custDetails[0].contactNo1;
-    const items = salesOrder.items;
+const generateInvoice = (invoice) => {
+    const title = "INVOICE";
+    const invoiceID = invoice.invoiceID;
+    const invoiceDate = invoice.invoiceDate;
+    const dueDate = invoice.dueDate;
+    const custName = invoice.custDetails[0].customerName;
+    const address1 = invoice.custDetails[0].addressLine1;
+    const address2 = invoice.custDetails[0].addressLine2;
+    const address3 = invoice.custDetails[0].addressLine3;
+    const city = invoice.custDetails[0].city;
+    const state = invoice.custDetails[0].state;
+    const country = invoice.custDetails[0].country;
+    const PIN = invoice.custDetails[0].pincode;
+    const phoneNo = invoice.custDetails[0].contactNo1;
+    const items = invoice.items;
+    const otherCharges = invoice.otherCharges;
 
     let address = address1 + ", <br />" + address2 + ",<br/>";
     if (address3 !== "")
@@ -22,14 +24,17 @@ const salesOrderForm = (salesOrder) => {
     address += state + ", <br />";
     address += country + " - " + PIN + "<br/>";
     address += "Phone No. : " + phoneNo;
-    let total = 0;
+    let total = Number(otherCharges);
+    let otherChargesText = "";
+    if (total > 0)
+        otherChargesText = "<b>Other Charges: " + total;
 
     return `
     <!doctype html>
     <html>
        <head>
           <meta charset="utf-8">
-          <title>Sales Order</title>
+          <title>Invoice</title>
           <style>
              .invoice-box {
              max-width: 800px;
@@ -125,17 +130,25 @@ const salesOrderForm = (salesOrder) => {
                    <td colspan="6">
                       <table>
                         <tr>
-                           <td><b>SO number:</b> ${soID}</td>
+                           <td><b>Invoice No.:</b> ${invoiceID}</td>
                            <td class="text-right">
-                              <b>Date:</b> ${orderDate.toString().substring(0, 15)}
+                              <b>Date:</b> ${invoiceDate.toString().substring(0, 15)}
                            </td>
                         </tr>
                          <tr>
                             <td>
-                               <b>Customer name:</b> ${custName}
+                               <b>Billed to:</b> ${custName}
                             </td>
                             <td class="text-right">
                                <b>Address:</b> ${address}
+                            </td>
+                         </tr>
+                         <tr>
+                            <td>
+                                <b>Due Date:</b>${dueDate.toString().substring(0, 15)}
+                            </td>
+                            <td>
+                                <b>${otherChargesText}</b>
                             </td>
                          </tr>
                       </table>
@@ -168,8 +181,7 @@ const salesOrderForm = (salesOrder) => {
              <br />
              <div class="justify-center">
                <h1>Total price: ${total.toFixed(2)}</h1>
-               <i>${numToEnglish(total)} only</i> <br/>
-               *exclusive of packaging and shipping charges
+               <i>${numToEnglish(total)} only</i>
             </div>
           </div>
        </body>
@@ -177,4 +189,4 @@ const salesOrderForm = (salesOrder) => {
     `;
 };
 
-module.exports = salesOrderForm;
+module.exports = generateInvoice;
