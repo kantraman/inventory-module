@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AddedItem = require('./AddedItem');
 const Schema = mongoose.Schema;
 
 const PackageSchema = new Schema({
@@ -11,7 +12,7 @@ const PackageSchema = new Schema({
         required: true
     },
     items: {
-        type: Array,
+        type: [AddedItem],
         required: true
     },
     status: {

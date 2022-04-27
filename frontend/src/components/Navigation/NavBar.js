@@ -21,7 +21,7 @@ const NavBar = ({ visible }) => {
                     <Offcanvas.Title>Navigation</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    <Nav className="nav flex-column">
+                    <Nav className="nav myNav flex-column">
                         <NavDropdown title="Inventory" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/item-group">Item Group</NavDropdown.Item>
                             <NavDropdown.Item href="/item">Item</NavDropdown.Item>
@@ -34,6 +34,7 @@ const NavBar = ({ visible }) => {
                             <NavDropdown.Item href="/package">Package</NavDropdown.Item>
                             <NavDropdown.Item href="/challan">Delivery Challan</NavDropdown.Item>
                             <NavDropdown.Item href="/invoice">Invoice</NavDropdown.Item>
+                            <NavDropdown.Item href="/payments-rec">Payments Received</NavDropdown.Item>
                         </NavDropdown>
                         
                         <Nav.Link href="/Logout">Log Out</Nav.Link>

@@ -99,3 +99,20 @@ export const validateInvoice = (formValues) => {
     return errors;
 }
 
+export const validatePaymentsRec = (formValues) => {
+    const errors = {};
+
+    if (!formValues.customerID)
+        errors.customerName = "Customer details is required.";
+    if (!formValues.modeOfPayment)
+        errors.modeOfPayment = "Mode of payment is required.";
+    if (!formValues.paymentRecDate)
+        errors.paymentRecDate = "Invoice date is required.";
+    if (!formValues.amount || Number(formValues.amount ) <= 0)
+        errors.amount = "Paid amount is required.";
+    if (isNaN(formValues.bankCharges))
+        errors.bankCharges = "Invalid bank charges";
+    
+    return errors;
+}
+

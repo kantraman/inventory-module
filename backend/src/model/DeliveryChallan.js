@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AddedItem = require('./AddedItem');
 const Schema = mongoose.Schema;
 
 const DeliveryChallanSchema = new Schema({
@@ -27,7 +28,7 @@ const DeliveryChallanSchema = new Schema({
         required: true
     },
     items: {
-        type: Array,
+        type: [AddedItem],
         required: true
     }
 });

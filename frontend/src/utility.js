@@ -9,3 +9,7 @@ export function formatDate(date) {
     
     return date;
 }
+
+export function formatNum(amount) {
+    return Number(amount).toFixed(2);
+}

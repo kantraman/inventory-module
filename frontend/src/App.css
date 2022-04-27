@@ -11,6 +11,11 @@
   border-radius: 5px;
 }
 
+.formHeadPill{
+  color: white;
+  background-color: peachpuff;
+}
+
 .cover{
   position:fixed;
   top: 0px;

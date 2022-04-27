@@ -204,7 +204,7 @@ export const getAllInvoice = async (token, status="") => {
             salesOrderID: (item.salesOrderID === 0) ? "" : item.salesOrderID
         };
         if (status !== "") {
-            if (item.status === status)
+            if (status.indexOf(item.status) > -1)
                 allInvoices.push(invoice);
         } else {
             allInvoices.push(invoice);

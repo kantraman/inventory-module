@@ -29,6 +29,7 @@ const {
     getInvoice,
     getInvoiceForm
 } = require("../controller/invoiceController");
+const { insertPaymentReceived, getPayRec4Period } = require("../controller/paymentRecController");
 
 const salesRouter = express.Router();
 
@@ -59,5 +60,9 @@ salesRouter.post("/invoice", auth, (req, res) => insertInvoice(req, res));
 salesRouter.put("/invoice/:id/update", auth, (req, res) => updateInvoiceStatus(req, res));
 salesRouter.get("/invoice/:id", auth, (req, res) => getInvoice(req, res));
 salesRouter.get("/view-invoice/:id", auth, (req, res) => getInvoiceForm(req, res));
+
+//Payments Received
+salesRouter.post("/payments-rec", auth, (req, res) => insertPaymentReceived(req, res));
+salesRouter.get("/payments-rec", auth, (req, res) => getPayRec4Period(req, res));
 
 module.exports = salesRouter;

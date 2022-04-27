@@ -4,39 +4,29 @@ import useToken from '../Admin/useToken';
 import { Form, Table, Row, Button} from 'react-bootstrap';
 import Logout from '../Admin/logout';
 import PickList from '../PickList/PickList';
-import { getItemDetails, getItemGroups } from '../Items/loadItems';
-import { intializeItems } from '../PickList/intializeProperties';
+import { getSpecificCustomer } from './loadDataSales';
+import { intializeCustomer } from '../PickList/intializeProperties';
 import { formatDate, formatNum } from '../../utility';
 
-const SalesOrderDatewise = () => {
+const PaymentReceivedDatewise = () => {
     const initValues = {
         fromDate: formatDate(new Date(Date.now()).toLocaleDateString("en-UK")),
         toDate: formatDate(new Date(Date.now()).toLocaleDateString("en-UK")),
-        groupID: "",
-        itemID: "",
-        itemName: ""
+        customerID: "",
+        customerName: ""
     }
     const { token } = useToken();
     //Set initial dates
     const [postValues, setPostValues] = useState(initValues);
     const [errorValues, setErrorValues] = useState({});
-    const [itemGroups, setItemGroups] = useState([]);
     const [details, setDetails] = useState([]);
     //Picklist 
-    const [plItems, setPlItems] = useState({});
+    const [plProps, setPlProps] = useState({});
     const loadPicklistProps = async (token) => {
-        const itemGroups = await getItemGroups(token);
-        setItemGroups(itemGroups);
+        let customersList = await intializeCustomer(token);
+        setPlProps(customersList);
     }
     useEffect(() => loadPicklistProps(token), []);
-
-    //To handle item group change
-    const handleItemGrpChange = async (event) => {
-        const { name, value } = event.target;
-        setPostValues({ ...postValues, [name]: value });
-        let itemList = await intializeItems(value, token);
-        setPlItems(itemList);
-    }
 
     //Input values to itemDetails
     function handleChange(event) {
@@ -44,11 +34,11 @@ const SalesOrderDatewise = () => {
         setPostValues({ ...postValues, [name]: value });
     }
 
-    //Load item details
-    const loadItemDetails = async (item) => {
-        const itemDetails = await getItemDetails(token, item[0]);
-        postValues.itemID = itemDetails.itemID;
-        postValues.itemName = itemDetails.itemName;
+    //Load customer details
+    const loadCustomerDetails = async (customer) => {
+        const itemDetails = await getSpecificCustomer(customer[0], token);
+        postValues.customerID = itemDetails.customerID;
+        postValues.customerName = itemDetails.customerName;
         setPostValues({ ...postValues });
     }
 
@@ -84,17 +74,17 @@ const SalesOrderDatewise = () => {
     const getDetails = async () => {
         let fromDate = postValues.fromDate;
         let toDate = postValues.toDate;
-        let item = postValues.itemID;
+        let customerID = postValues.customerID;
         let validationErrors = validateDates();
         setErrorValues(validationErrors);
         setDetails([]);
         if (Object.keys(validationErrors).length !== 0)
             return 0;
         try {
-            let apiURL = "/api/sales/sales-order";
+            let apiURL = "/api/sales/payments-rec";
             apiURL += "?fromDate=" + fromDate + "&toDate=" + toDate;
-            if (item !== "")
-                apiURL += "&item=" + item;
+            if (customerID !== "")
+                apiURL += "&id=" + customerID;
             let options = {
                 headers: {
                     'Content-Type': 'application/json',
@@ -127,25 +117,18 @@ const SalesOrderDatewise = () => {
                     <Form.Control type="date" name="toDate" value={postValues.toDate} onChange={handleChange} />
                     <Form.Text className="text-danger">{errorValues.toDate}</Form.Text>
                 </Form.Group>
-                <Form.Group className="col-md-6  mb-3" controlId="formItemGroup">
-                    <Form.Label>Item Group</Form.Label>
-                    <Form.Select name="groupID" value={postValues.groupID} onChange={handleItemGrpChange} >
-                        <option value="">--Select--</option>
-                        {itemGroups.map(item => <option value={item.ID} key={item.ID}>{item["Group Name"]}</option>)}
-                    </Form.Select>
-                </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formItem">
-                    <Form.Label>Select Item</Form.Label>
-                    <PickList title={plItems.title} rowHeaders={plItems.rowHeaders} search={plItems.search}
-                        data={plItems.data} onSelect={loadItemDetails} />
+                    <Form.Label>Select Customer</Form.Label>
+                    <PickList title={plProps.title} rowHeaders={plProps.rowHeaders} search={plProps.search}
+                        data={plProps.data} onSelect={loadCustomerDetails} />
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-3" controlId="formItemID">
-                    <Form.Label>Item ID</Form.Label>
-                    <Form.Control type="text" name="itemID" value={postValues.itemID} placeholder="Item ID" disabled />
+                <Form.Group className="col-md-6 mb-3" controlId="formCustomerID">
+                    <Form.Label>Customer ID</Form.Label>
+                    <Form.Control type="text" name="customerID" value={postValues.customerID} placeholder="Customer ID" disabled />
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-3" controlId="formItemName">
-                    <Form.Label>Item Name</Form.Label>
-                    <Form.Control type="text" name="itemName" value={postValues.itemName} placeholder="Item Name" disabled />
+                <Form.Group className="col-md-6 mb-3" controlId="formCustomerName">
+                    <Form.Label>Customer Name</Form.Label>
+                    <Form.Control type="text" name="customerName" value={postValues.customerName} placeholder="Customer Name" disabled />
                 </Form.Group>
             </Row>
             <Button type="button" onClick={getDetails}>View</Button> &emsp;
@@ -169,34 +152,30 @@ const ShowDetails = ({ details }) => {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Status</th>
                         <th>Date</th>
                         <th>Cust.ID</th>
                         <th>Customer Name</th>
-                        <th>Item ID</th>
-                        <th>Item Name</th>
-                        <th className="text-end">Price</th>
-                        <th className="text-end">Tax</th>
-                        <th className="text-end">Quantity</th>
-                        <th className="text-end">Total</th>
+                        <th>Invoice ID</th>
+                        <th>Mode of payment</th>
+                        <th className="text-end">Amount</th>
+                        <th className="text-end">Bank Charges</th>
+                        <th>Notes</th>
                     </tr>
                 </thead>
                 <tbody>
                     {
                         details.map(item => {
                             return (
-                                <tr key={item.salesOrderID}>
-                                    <td>{item.salesOrderID}</td>
-                                    <td>{item.status}</td>
-                                    <td>{item.orderDate.toString().substring(0, 10)}</td>
+                                <tr key={item.paymentRecID}>
+                                    <td>{item.paymentRecID}</td>
+                                    <td>{item.paymentRecDate.toString().substring(0, 10)}</td>
                                     <td>{item.customerID}</td>
                                     <td>{item.custDetails[0].customerName}</td>
-                                    <td>{item.items.itemID}</td>
-                                    <td>{item.items.itemName}</td>
-                                    <td className="text-end">{formatNum(item.items.price)}</td>
-                                    <td className="text-end">{formatNum(item.items.tax)}</td>
-                                    <td className="text-end">{item.items.quantity}</td>
-                                    <td className="text-end">{formatNum(item.items.total)}</td>
+                                    <td>{item.invoiceID}</td>
+                                    <td>{item.modeOfPayment}</td>
+                                    <td className="text-end">{formatNum(item.amount)}</td>
+                                    <td className="text-end">{formatNum(item.bankCharges)}</td>
+                                    <td>{item.notes}</td>
                                 </tr>
                             );
                         })
@@ -207,4 +186,4 @@ const ShowDetails = ({ details }) => {
     )
 }
 
-export default SalesOrderDatewise;
+export default PaymentReceivedDatewise;

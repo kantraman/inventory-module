@@ -168,10 +168,10 @@ const generateInvoice = (invoice) => {
                         <tr>
                             <td>${item.itemID}</td>
                             <td>${item.itemName}</td>
-                            <td class="text-right">${item.price}</td>
-                            <td class="text-right">${item.tax}</td>
+                            <td class="text-right">${Number(item.price).toFixed(2)}</td>
+                            <td class="text-right">${Number(item.tax).toFixed(2)}</td>
                             <td class="text-right">${item.quantity}</td>
-                            <td class="text-right">${item.total}</td>
+                            <td class="text-right">${Number(item.total).toFixed(2)}</td>
                         </tr>` 
                     )
                 })

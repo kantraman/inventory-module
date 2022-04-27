@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AddedItem = require('./AddedItem');
 const Schema = mongoose.Schema;
 
 const InvoiceSchema = new Schema({
@@ -22,7 +23,7 @@ const InvoiceSchema = new Schema({
         required: true
     },
     items: {
-        type: Array,
+        type: [AddedItem],
         required: true
     },
     otherCharges: {

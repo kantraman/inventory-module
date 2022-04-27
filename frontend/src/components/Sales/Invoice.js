@@ -81,7 +81,7 @@ const Invoice = () => {
     //Load Invoice details
     const loadInvoiceDetails = async (selInvoice) => {
         const invoice = await getInvoiceDetails(selInvoice[0], token);
-        console.log(invoice);
+      
         const postData = {
             invoiceID: invoice.invoiceID,
             salesOrderID: invoice.salesOrderID,

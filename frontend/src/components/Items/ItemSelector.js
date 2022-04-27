@@ -191,10 +191,10 @@ const ItemSelector = ({
                             <tr key={index} onClick={selectRow}>
                                 <td>{item.itemID}</td>
                                 <td>{item.itemName}</td>
-                                <td className="text-end">{item.price}</td>
-                                <td className="text-end">{item.tax}</td>
+                                <td className="text-end">{Number(item.price).toFixed(2)}</td>
+                                <td className="text-end">{Number(item.tax).toFixed(2)}</td>
                                 <td className="text-end">{item.quantity}</td>
-                                <td className="text-end">{item.total}</td>
+                                <td className="text-end">{Number(item.total).toFixed(2)}</td>
                             </tr>
                         )
                     })}

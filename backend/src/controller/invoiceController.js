@@ -132,10 +132,35 @@ const getInvoiceForm = async (req, res) => {
     }
 }
 
+//Calculate invoice total
+const getInvoiceTotal = async (invoiceID) => {
+    try {
+        let invoice = await Invoices
+            .aggregate()
+            .match({ invoiceID: Number(invoiceID) })
+            .unwind({
+                path: "$items",
+                includeArrayIndex: 'string',
+                preserveNullAndEmptyArrays: true
+            })
+            .group({
+                _id: "$invoiceID",
+                total: { $sum: "$items.total" },
+                otherCharges: { $first: "$otherCharges" }
+            });
+        let grandTotal = Number(invoice.total) + Number(invoice.otherCharges);
+        return grandTotal;
+        
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 
 module.exports = {
     insertInvoice,
     updateInvoiceStatus,
     getInvoice,
-    getInvoiceForm
+    getInvoiceForm,
+    getInvoiceTotal
 }

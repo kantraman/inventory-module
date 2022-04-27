@@ -49,6 +49,8 @@ const PickList = ({
             return true;
         });
         setDetails(ds);
+        if (ds.length === 0)
+            window.alert("No records found.");
     }
     //Pass selected row data
     const select = (event) => {

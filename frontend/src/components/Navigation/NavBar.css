@@ -1,14 +1,18 @@
-.nav-link {
+.myNav .nav-link {
     text-decoration: none;
     color: #fff !important;
     font-size: large;
 }
 
-.dropdown-item{
+.myNav .dropdown-item{
     color: #fff;
     border: 1px solid #fff;
 }
 
-.dropdown-menu{
+.myNav .dropdown-item:hover{
+    color: #333333;
+}
+
+.myNav .dropdown-menu{
     background-color:#333333;
 }
