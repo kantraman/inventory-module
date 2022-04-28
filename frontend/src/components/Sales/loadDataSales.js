@@ -247,3 +247,47 @@ export const showInvoiceForm = async (token, invoiceID) => {
     }
             
 };
+
+export const getAllSalesReturns = async (token, status="") => {
+    const allSalesReturns = [];
+    const response = await axios.get("/api/sales/sales-return/A", {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+  
+    items.forEach((item) => {
+        let salesReturn = {
+            salesReturnID: item.salesReturnID,
+            status: item.status,
+            receivedDate: item.receivedDate.substring(0, 10),
+            customerID: item.customerID,
+            customerName: item.custDetails[0].customerName,
+            addressLine1: item.custDetails[0].addressLine1,
+            reason: item.reason,
+            invoiceID: item.invoiceID
+        };
+        if (status !== "") {
+            if (status.indexOf(item.status) > -1)
+                allSalesReturns.push(salesReturn);
+        } else {
+            allSalesReturns.push(salesReturn);
+        }
+    })
+    
+    return allSalesReturns;
+};
+
+export const getSalesReturnsDetails = async (salesReturnID, token) => {
+    const response = await axios.get(`/api/sales/sales-return/${salesReturnID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    return items[0];
+};
+

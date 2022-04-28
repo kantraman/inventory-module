@@ -17,6 +17,7 @@ import Package from "./components/Sales/Package";
 import DeliveryChallan from "./components/Sales/DeliveryChallan";
 import Invoice from "./components/Sales/Invoice";
 import PaymentsRecTab from "./components/Sales/PaymentsRecTab";
+import SalesReturn from "./components/Sales/SalesReturn";
 
 function App() {
   const { token, setToken } = useToken();
@@ -58,6 +59,7 @@ function App() {
         <Route path="/challan" element={<DeliveryChallan />} />
         <Route path="/invoice" element={<Invoice />} />
         <Route path="/payments-rec" element={<PaymentsRecTab />} />
+        <Route path="/sales-returns" element={<SalesReturn />} />
       </Routes>
     </div>
   );

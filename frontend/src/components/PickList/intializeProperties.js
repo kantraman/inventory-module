@@ -4,7 +4,8 @@ import {
     getCustomers,
     getAllPackages,
     getAllDeliveryChallan,
-    getAllInvoice
+    getAllInvoice,
+    getAllSalesReturns
 } from "../Sales/loadDataSales";
 
 export const intializeCustomer = async (token) => {
@@ -91,6 +92,22 @@ export const intializeInvoice = async (token, status="") => {
     details.data = await getAllInvoice(token, status);
     details.title = "INVOICES";
     details.rowHeaders = ["ID", "Status", "Date", "Due Date", "Cust. ID", "Customer Name", "Address", "SO ID"];
+    details.search = [{
+        title: "Name",
+        field: "customerName"
+    }, {
+        title: "Address",
+        field: "addressLine1"
+    }]
+    return details;
+}
+
+export const intializeSalesReturns = async (token, status="") => {
+    const details = {};
+    details.data = await getAllSalesReturns(token, status);
+    details.title = "SALES RETURNS";
+    details.rowHeaders = ["ID", "Status", "Date", "Cust. ID", "Customer Name",
+        "Address", "Reason", "Invoice ID"];
     details.search = [{
         title: "Name",
         field: "customerName"

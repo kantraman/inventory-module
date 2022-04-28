@@ -84,10 +84,10 @@ const getInvoice = async (req, res) => {
                 .aggregate()
                 .lookup(lookupQ)
                 .sort({ invoiceDate: -1 });
-        }else {
+        } else {
             invoice = await Invoices
                 .aggregate()
-                .match({invoiceID: Number(invoiceID)})
+                .match({ invoiceID: Number(invoiceID) })
                 .lookup(lookupQ)
                 .sort({ invoiceDate: -1 });
         }
@@ -101,7 +101,7 @@ const getInvoice = async (req, res) => {
         if (!res.headersSent)
             res.json({ status: "Error", message: error.message });
     }
-}
+};
 
 //Get invoice form 
 const getInvoiceForm = async (req, res) => {
@@ -130,7 +130,7 @@ const getInvoiceForm = async (req, res) => {
         if (!res.headersSent)
             res.json({ status: "Error", message: error.message });
     }
-}
+};
 
 //Calculate invoice total
 const getInvoiceTotal = async (invoiceID) => {
@@ -154,7 +154,7 @@ const getInvoiceTotal = async (invoiceID) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 
 module.exports = {
@@ -163,4 +163,4 @@ module.exports = {
     getInvoice,
     getInvoiceForm,
     getInvoiceTotal
-}
+};

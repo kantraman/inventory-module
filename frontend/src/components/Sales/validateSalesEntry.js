@@ -116,3 +116,37 @@ export const validatePaymentsRec = (formValues) => {
     return errors;
 }
 
+export const validateSalesReturns = (formValues, returnItems) => {
+    const errors = {};
+    let blnValid = true;
+
+    if (!formValues.customerID)
+        errors.customerName = "Customer details is required.";
+    if (!formValues.status)
+        errors.status = "Status is required.";
+    if (formValues.items.length === 0) {
+        errors.items = "Select the items.";
+    } else {
+        if (formValues.items.length > returnItems.length) {
+            errors.items = "Inconsistency detected in items.";
+            blnValid = false;
+        }
+        if (blnValid) {
+            formValues.items.forEach((element) => {
+                let found = returnItems.some((returnItem) => returnItem.itemID === element.itemID
+                && returnItem.quantity >= Number(element.quantity))
+                if (!found)
+                    errors.items = "Inconsistency detected in items.";
+            })
+        }
+    }
+    if (!formValues.receivedDate)
+        errors.receivedDate = "Received date is required.";
+    if (!formValues.reason)
+        errors.reason = "Reason is required.";
+    if (!formValues.invoiceID)
+        errors.invoiceID = "Select invoice";
+    
+    return errors;
+}
+
