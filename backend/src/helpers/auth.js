@@ -4,11 +4,15 @@ const auth = (req, res, next) => {
     try {
         const token = req.body.token || req.query.token || req.headers["x-access-token"];
         if (!token)
-            res.status(401).json({ msg: "No authentication token, access denied" });
-        const verified = jwt.verify(token, process.env.JWT_Key);
-        if (!verified)
-            res.status(401).json({ msg: "Token verification failed, authorization denied" });
-        req.user = verified.uname;
+            return res.status(401).json({ msg: "No authentication token, access denied" });
+        try {
+            const verified = jwt.verify(token, process.env.JWT_Key);
+            if (!verified)
+                return res.status(401).json({ msg: "Token verification failed, authorization denied" });
+            req.user = verified.uname;
+        } catch (err) {
+            return res.status(401).json({ msg: "Token verification failed, authorization denied" });
+        }
         next();
     } catch (err) {
         res.status(500).json({ error: err.message });

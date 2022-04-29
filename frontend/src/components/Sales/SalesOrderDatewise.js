@@ -6,7 +6,7 @@ import Logout from '../Admin/logout';
 import PickList from '../PickList/PickList';
 import { getItemDetails, getItemGroups } from '../Items/loadItems';
 import { intializeItems } from '../PickList/intializeProperties';
-import { formatDate, formatNum } from '../../utility';
+import { formatDate, formatNum, formatDateFromDB } from '../../utility';
 
 const SalesOrderDatewise = () => {
     const initValues = {
@@ -188,7 +188,7 @@ const ShowDetails = ({ details }) => {
                                 <tr key={item.salesOrderID}>
                                     <td>{item.salesOrderID}</td>
                                     <td>{item.status}</td>
-                                    <td>{item.orderDate.toString().substring(0, 10)}</td>
+                                    <td>{formatDateFromDB(item.orderDate)}</td>
                                     <td>{item.customerID}</td>
                                     <td>{item.custDetails[0].customerName}</td>
                                     <td>{item.items.itemID}</td>

@@ -1,3 +1,4 @@
+const convertJsonToExcel = require("../helpers/convertToExcel");
 const InvAdj = require("../model/InventoryAdjustments");
 
 //Insert inventory adjustment
@@ -39,6 +40,7 @@ const getInvAdjDatewise = async (req, res) => {
         let fromDate = new Date(req.query.fromDate);
         let toDate = new Date(req.query.toDate);
         toDate.setDate(toDate.getDate() + 1);
+        let exportToExcel = req.query.exportToExcel;
 
         let filter = {
             adjDate: {
@@ -60,7 +62,11 @@ const getInvAdjDatewise = async (req, res) => {
         }
         let invAdj = await InvAdj.find(filter, projection);
         if (invAdj.length > 0) {
-            res.json(invAdj);
+            if (exportToExcel === "Y") {
+                convertJsonToExcel(invAdj, "Inventory Adjustment", res);
+            } else {
+                res.json(invAdj);
+            }
         } else {
             res.json({ status: "Error", message: "No records found" });
         }

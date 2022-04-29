@@ -150,3 +150,20 @@ export const validateSalesReturns = (formValues, returnItems) => {
     return errors;
 }
 
+export const validateCreditNote = (formValues) => {
+    const errors = {};
+
+    if (!formValues.customerID)
+        errors.customerName = "Customer details is required.";
+    if (!formValues.status)
+        errors.status = "Status is required.";
+    if (!formValues.creditNoteDate)
+        errors.creditNoteDate = "Credit note date is required.";
+    if (!formValues.refNo)
+        errors.refNo = "Reference no. is required.";
+    if (Number(formValues.amount) <= 0)
+        errors.amount = "Invalid amount";
+    
+    return errors;
+}
+

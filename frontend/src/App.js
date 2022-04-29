@@ -7,6 +7,7 @@ import useToken from './components/Admin/useToken';
 import ItemGroup from "./components/Items/ItemGroup";
 import Items from "./components/Items/Items";
 import InventoryAdj from "./components/Items/InventoryAdj";
+import ItemAdjDatewise from "./components/Items/ItemAdjDatewise";
 import NavBar from "./components/Navigation/NavBar";
 import Home from "./components/Navigation/Home";
 import Logout from "./components/Admin/logout";
@@ -16,8 +17,11 @@ import SalesOrderDatewise from "./components/Sales/SalesOrderDatewise";
 import Package from "./components/Sales/Package";
 import DeliveryChallan from "./components/Sales/DeliveryChallan";
 import Invoice from "./components/Sales/Invoice";
+import PaymentReceived from './components/Sales/PaymentsReceived';
+import PaymentReceivedDatewise from './components/Sales/PaymentReceivedDatewise';
 import PaymentsRecTab from "./components/Sales/PaymentsRecTab";
 import SalesReturn from "./components/Sales/SalesReturn";
+import CreditNote from "./components/Sales/CreditNote";
 
 function App() {
   const { token, setToken } = useToken();
@@ -50,7 +54,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/item-group" element={<ItemGroup />} />
         <Route path="/item" element={<Items />} />
-        <Route path="/inv-adjustment" element={<InventoryAdj />} />
+        <Route path="/inv-adjustment" element={<PaymentsRecTab tab1={<InventoryAdj />} tab2={ <ItemAdjDatewise /> }/> }/>
         <Route path="/customer" element={<Customer />} />
         <Route path="/Logout" element={<Logout />} />
         <Route path="/sales-order" element={<SalesOrder />} />
@@ -58,8 +62,9 @@ function App() {
         <Route path="/package" element={<Package />} />
         <Route path="/challan" element={<DeliveryChallan />} />
         <Route path="/invoice" element={<Invoice />} />
-        <Route path="/payments-rec" element={<PaymentsRecTab />} />
+        <Route path="/payments-rec" element={<PaymentsRecTab tab1={<PaymentReceived />} tab2={<PaymentReceivedDatewise />} />} />
         <Route path="/sales-returns" element={<SalesReturn />} />
+        <Route path="/credit-note" element={<CreditNote />} />
       </Routes>
     </div>
   );

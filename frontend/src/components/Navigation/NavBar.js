@@ -36,6 +36,7 @@ const NavBar = ({ visible }) => {
                             <NavDropdown.Item href="/invoice">Invoice</NavDropdown.Item>
                             <NavDropdown.Item href="/payments-rec">Payments Received</NavDropdown.Item>
                             <NavDropdown.Item href="/sales-returns">Sales Returns</NavDropdown.Item>
+                            <NavDropdown.Item href="/credit-note">Credit Note</NavDropdown.Item>
                         </NavDropdown>
                         
                         <Nav.Link href="/Logout">Log Out</Nav.Link>

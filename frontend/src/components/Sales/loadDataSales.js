@@ -1,5 +1,6 @@
 import axios from "axios";
 import Logout from "../Admin/logout";
+import { formatNum, formatDateFromDB } from "../../utility";
 
 const handleResponse = (response) => {
     if (response.status === 401)
@@ -63,7 +64,7 @@ export const getAllSalesOrders = async (token, status="") => {
             customerID: item.customerID,
             customerName: item.custDetails[0].customerName,
             addressLine1: item.custDetails[0].addressLine1,
-            orderDate: item.orderDate.substring(0, 10)
+            orderDate: formatDateFromDB(item.orderDate)
         };
         if (status !== "") {
             if (item.status === status)
@@ -112,7 +113,7 @@ export const getAllPackages = async (token, status="") => {
         let packages = {
             packageID: item.packageID,
             status: item.status,
-            packageDate: item.packageDate.substring(0, 10),
+            packageDate: formatDateFromDB(item.packageDate),
             customerID: item.customerID,
             customerName: item.custDetails[0].customerName,
             addressLine1: item.custDetails[0].addressLine1,
@@ -154,7 +155,7 @@ export const getAllDeliveryChallan = async (token, status="") => {
         let challans = {
             challanID: item.challanID,
             status: item.status,
-            challanDate: item.challanDate.substring(0, 10),
+            challanDate: formatDateFromDB(item.challanDate),
             challanType: item.challanType,
             customerID: item.customerID,
             customerName: item.custDetails[0].customerName,
@@ -196,8 +197,8 @@ export const getAllInvoice = async (token, status="") => {
         let invoice = {
             invoiceID: item.invoiceID,
             status: item.status,
-            invoiceDate: item.invoiceDate.substring(0, 10),
-            dueDate: item.dueDate.substring(0, 10),
+            invoiceDate: formatDateFromDB(item.invoiceDate),
+            dueDate: formatDateFromDB(item.dueDate),
             customerID: item.customerID,
             customerName: item.custDetails[0].customerName,
             addressLine1: item.custDetails[0].addressLine1,
@@ -262,7 +263,7 @@ export const getAllSalesReturns = async (token, status="") => {
         let salesReturn = {
             salesReturnID: item.salesReturnID,
             status: item.status,
-            receivedDate: item.receivedDate.substring(0, 10),
+            receivedDate: formatDateFromDB(item.receivedDate),
             customerID: item.customerID,
             customerName: item.custDetails[0].customerName,
             addressLine1: item.custDetails[0].addressLine1,
@@ -282,6 +283,51 @@ export const getAllSalesReturns = async (token, status="") => {
 
 export const getSalesReturnsDetails = async (salesReturnID, token) => {
     const response = await axios.get(`/api/sales/sales-return/${salesReturnID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    return items[0];
+};
+
+export const getAllCreditNotes = async (token, status="") => {
+    const getAllCreditNotes = [];
+    const response = await axios.get("/api/sales/credit-note/A", {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+  
+    items.forEach((item) => {
+        let creditNote = {
+            creditNoteID: item.creditNoteID,
+            status: item.status,
+            creditNoteDate: formatDateFromDB(item.creditNoteDate),
+            refNo: item.refNo,
+            customerID: item.customerID,
+            customerName: item.custDetails[0].customerName,
+            addressLine1: item.custDetails[0].addressLine1,
+            amount: formatNum(item.amount),
+            salesReturnID: item.salesReturnID,
+            invoiceID: item.invoiceID
+        };
+        if (status !== "") {
+            if (status.indexOf(item.status) > -1)
+                getAllCreditNotes.push(creditNote);
+        } else {
+            getAllCreditNotes.push(creditNote);
+        }
+    })
+    
+    return getAllCreditNotes;
+};
+
+export const getCreditNoteDetails = async (creditNoteID, token) => {
+    const response = await axios.get(`/api/sales/credit-note/${creditNoteID}`, {
         headers: {
             'Content-Type': 'application/json',
             'x-access-token': token

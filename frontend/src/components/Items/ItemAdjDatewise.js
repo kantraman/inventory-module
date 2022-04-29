@@ -1,47 +1,27 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import useToken from '../Admin/useToken';
 import { Form, Table, Row, Button} from 'react-bootstrap';
 import Logout from '../Admin/logout';
-import PickList from '../PickList/PickList';
-import { getSpecificCustomer } from './loadDataSales';
-import { intializeCustomer } from '../PickList/intializeProperties';
-import { formatDate, formatNum, formatDateFromDB } from '../../utility';
+import { formatDate, formatDateFromDB } from '../../utility';
 
-const PaymentReceivedDatewise = () => {
+const ItemAdjDatewise = () => {
     const initValues = {
         fromDate: formatDate(new Date(Date.now()).toLocaleDateString("en-UK")),
-        toDate: formatDate(new Date(Date.now()).toLocaleDateString("en-UK")),
-        customerID: "",
-        customerName: ""
+        toDate: formatDate(new Date(Date.now()).toLocaleDateString("en-UK"))
     }
     const { token } = useToken();
     //Set initial dates
     const [postValues, setPostValues] = useState(initValues);
     const [errorValues, setErrorValues] = useState({});
     const [details, setDetails] = useState([]);
-    //Picklist 
-    const [plProps, setPlProps] = useState({});
-    const loadPicklistProps = async (token) => {
-        let customersList = await intializeCustomer(token);
-        setPlProps(customersList);
-    }
-    useEffect(() => loadPicklistProps(token), []);
+    
 
-    //Input values to postValues
+    //Input values to post values
     function handleChange(event) {
         const { name, value } = event.target;
         setPostValues({ ...postValues, [name]: value });
     }
-
-    //Load customer details
-    const loadCustomerDetails = async (customer) => {
-        const itemDetails = await getSpecificCustomer(customer[0], token);
-        postValues.customerID = itemDetails.customerID;
-        postValues.customerName = itemDetails.customerName;
-        setPostValues({ ...postValues });
-    }
-
 
     //Validate Dates
     const validateDates = () => {
@@ -71,33 +51,55 @@ const PaymentReceivedDatewise = () => {
         return validationErrors;
     }
 
-    const getDetails = async () => {
+    const getDetails = async (event) => {
+        const { name } = event.target;
         let fromDate = postValues.fromDate;
         let toDate = postValues.toDate;
-        let customerID = postValues.customerID;
         let validationErrors = validateDates();
+        let exportToExcel = "N";
+        if (name === "export")
+            exportToExcel = "Y";
         setErrorValues(validationErrors);
         setDetails([]);
         if (Object.keys(validationErrors).length !== 0)
             return 0;
         try {
-            let apiURL = "/api/sales/payments-rec";
+            let apiURL = "/api/inventory/inv-adj-datewise";
             apiURL += "?fromDate=" + fromDate + "&toDate=" + toDate;
-            if (customerID !== "")
-                apiURL += "&id=" + customerID;
+            apiURL += "&exportToExcel=" + exportToExcel;
             let options = {
                 headers: {
                     'Content-Type': 'application/json',
                     'x-access-token': token
                 }
             }
+            if (exportToExcel === "Y") {
+                options.responseType = 'blob';
+                options.timeout = 30000;
+            }
             let response = await axios.get(apiURL, options);
             if (response.status === 401)
                 Logout();
-            if (Array.isArray(response.data))
-                setDetails(response.data);
-            else
-                window.alert(response.data.message);
+            if (exportToExcel !== "Y") {
+                if (Array.isArray(response.data))
+                    setDetails(response.data);
+                else
+                    window.alert(response.data.message);
+            } else {
+                if (response.data.type ===
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+                    const blob = await response.data;
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                    URL.revokeObjectURL(url);
+                } else if (response.data.type === "application/json") {
+                    if (response.data.status)
+                        window.alert(response.data.message);
+                } else {
+                    window.alert("An unexpected error occured.");
+                }
+            }
+            console.log(response);
         } catch (err) {
             window.alert("An error occurred while getting data.");
         }
@@ -105,7 +107,7 @@ const PaymentReceivedDatewise = () => {
 
     return (
         <Form className="mx-auto col-lg-8 col-md-10 col-sm-12 p-3 formBg">
-            <div className="text-center fs-3 mb-1 formHead">VIEW PAYMENTS RECEIVED DATEWISE</div>
+            <div className="text-center fs-3 mb-1 formHead">VIEW INVENTORY ADJUSTMENT DATEWISE</div>
             <Row>
                 <Form.Group className="col-md-6 mb-2" controlId="formFromDate">
                     <Form.Label>From Date</Form.Label>
@@ -117,22 +119,9 @@ const PaymentReceivedDatewise = () => {
                     <Form.Control type="date" name="toDate" value={postValues.toDate} onChange={handleChange} />
                     <Form.Text className="text-danger">{errorValues.toDate}</Form.Text>
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-3" controlId="formItem">
-                    <Form.Label>Select Customer</Form.Label>
-                    <PickList title={plProps.title} rowHeaders={plProps.rowHeaders} search={plProps.search}
-                        data={plProps.data} onSelect={loadCustomerDetails} />
-                </Form.Group>
-                <Form.Group className="col-md-6 mb-3" controlId="formCustomerID">
-                    <Form.Label>Customer ID</Form.Label>
-                    <Form.Control type="text" name="customerID" value={postValues.customerID} placeholder="Customer ID" disabled />
-                </Form.Group>
-                <Form.Group className="col-md-6 mb-3" controlId="formCustomerName">
-                    <Form.Label>Customer Name</Form.Label>
-                    <Form.Control type="text" name="customerName" value={postValues.customerName} placeholder="Customer Name" disabled />
-                </Form.Group>
             </Row>
-            <Button type="button" onClick={getDetails}>View</Button> &emsp;
-                
+            <Button type="button" name="view" onClick={getDetails}>View</Button> &emsp;
+            <Button type="button" name="export" onClick={getDetails}>Export</Button>  
             <div style={{ overflow: "auto", "whiteSpace": 'nowrap' }}>
                 <ShowDetails details={details} />
             </div>
@@ -151,31 +140,31 @@ const ShowDetails = ({ details }) => {
             <Table style={{ "whiteSpace": 'nowrap' }} hover variant="dark" responsive>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Date</th>
-                        <th>Cust.ID</th>
-                        <th>Customer Name</th>
-                        <th>Invoice ID</th>
-                        <th>Mode of payment</th>
-                        <th className="text-end">Amount</th>
-                        <th className="text-end">Bank Charges</th>
-                        <th>Notes</th>
+                        <th>Ref. No.</th>
+                        <th>Adj Mode</th>
+                        <th>Item ID</th>
+                        <th>Item Name</th>
+                        <th className="text-end">Quantity</th>
+                        <th>Unit</th>
+                        <th>Reason</th>
+                        <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
                     {
                         details.map(item => {
                             return (
-                                <tr key={item.paymentRecID}>
-                                    <td>{item.paymentRecID}</td>
-                                    <td>{formatDateFromDB(item.paymentRecDate)}</td>
-                                    <td>{item.customerID}</td>
-                                    <td>{item.custDetails[0].customerName}</td>
-                                    <td>{item.invoiceID}</td>
-                                    <td>{item.modeOfPayment}</td>
-                                    <td className="text-end">{formatNum(item.amount)}</td>
-                                    <td className="text-end">{formatNum(item.bankCharges)}</td>
-                                    <td>{item.notes}</td>
+                                <tr key={item["Ref No"]}>
+                                    <td>{formatDateFromDB(item["Date"])}</td>
+                                    <td>{item["Ref No"]}</td>
+                                    <td>{item["Adj Mode"] === "D" ? "Decrease" : "Increase"}</td>
+                                    <td>{item["Item ID"]}</td>
+                                    <td>{item["Item"]}</td>
+                                    <td className="text-end">{item["Quantity"]}</td>
+                                    <td>{item["Unit"]}</td>
+                                    <td>{item["Reason"]}</td>
+                                    <td>{item["Description"]}</td>
                                 </tr>
                             );
                         })
@@ -186,4 +175,4 @@ const ShowDetails = ({ details }) => {
     )
 }
 
-export default PaymentReceivedDatewise;
+export default ItemAdjDatewise;

@@ -38,6 +38,11 @@ const {
     getSalesReturn,
     updateSalesReturnStatus
 } = require("../controller/salesReturnController");
+const {
+    insertCreditNote,
+    updateCreditNote,
+    getCreditNote
+} = require("../controller/creditNoteController");
 
 const salesRouter = express.Router();
 
@@ -77,5 +82,10 @@ salesRouter.get("/payments-rec", auth, (req, res) => getPayRec4Period(req, res))
 salesRouter.post("/sales-return", auth, (req, res) => insertSalesReturn(req, res));
 salesRouter.put("/sales-return/:id/update", auth, (req, res) => updateSalesReturnStatus(req, res));
 salesRouter.get("/sales-return/:id", auth, (req, res) => getSalesReturn(req, res));
+
+//Credit Note
+salesRouter.post("/credit-note", auth, (req, res) => insertCreditNote(req, res));
+salesRouter.put("/credit-note/:id/update", auth, (req, res) => updateCreditNote(req, res));
+salesRouter.get("/credit-note/:id", auth, (req, res) => getCreditNote(req, res));
 
 module.exports = salesRouter;

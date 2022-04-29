@@ -43,6 +43,6 @@ inventoryRouter.get("/allitems4group/:id", auth, async (req, res) => getAllItems
 
 //Inventory Adjustment
 inventoryRouter.post("/inv-adj", auth, (req, res) => insertInvAdj(req, res));
-inventoryRouter.get("inv-adj-datewise", auth, async (req, res) => getInvAdjDatewise(req, res));
+inventoryRouter.get("/inv-adj-datewise", auth, async (req, res) => getInvAdjDatewise(req, res));
 
 module.exports = inventoryRouter;

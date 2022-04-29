@@ -5,7 +5,8 @@ import {
     getAllPackages,
     getAllDeliveryChallan,
     getAllInvoice,
-    getAllSalesReturns
+    getAllSalesReturns,
+    getAllCreditNotes
 } from "../Sales/loadDataSales";
 
 export const intializeCustomer = async (token) => {
@@ -108,6 +109,22 @@ export const intializeSalesReturns = async (token, status="") => {
     details.title = "SALES RETURNS";
     details.rowHeaders = ["ID", "Status", "Date", "Cust. ID", "Customer Name",
         "Address", "Reason", "Invoice ID"];
+    details.search = [{
+        title: "Name",
+        field: "customerName"
+    }, {
+        title: "Address",
+        field: "addressLine1"
+    }]
+    return details;
+}
+
+export const intializeCreditNote = async (token, status="") => {
+    const details = {};
+    details.data = await getAllCreditNotes(token, status);
+    details.title = "CREDIT NOTES";
+    details.rowHeaders = ["ID", "Status", "Date", "Ref. No.", "Cust. ID",
+        "Customer Name", "Address", "Amount", "Sales Return ID", "Invoice ID"];
     details.search = [{
         title: "Name",
         field: "customerName"
