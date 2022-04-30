@@ -1,4 +1,5 @@
 import { getItemByGroups } from "../Items/loadItems";
+import { getAllPurchaseOrders, getVendors } from "../Purchase/loadDataPurchase";
 import {
     getAllSalesOrders,
     getCustomers,
@@ -9,6 +10,7 @@ import {
     getAllCreditNotes
 } from "../Sales/loadDataSales";
 
+//Customer
 export const intializeCustomer = async (token) => {
     const details = {};
     details.data = await getCustomers(token);
@@ -26,6 +28,7 @@ export const intializeCustomer = async (token) => {
     return details;
 }
 
+//Inventory items
 export const intializeItems = async (groupID, token) => {
     const details = {};
     details.data = await getItemByGroups(token, groupID);
@@ -43,6 +46,7 @@ export const intializeItems = async (groupID, token) => {
     return details;
 }
 
+//Sales Order
 export const intializeSalesOrder = async (token, status="") => {
     const details = {};
     details.data = await getAllSalesOrders(token, status);
@@ -58,6 +62,7 @@ export const intializeSalesOrder = async (token, status="") => {
     return details;
 }
 
+//Packages
 export const intializePackage = async (token, status="") => {
     const details = {};
     details.data = await getAllPackages(token, status);
@@ -73,6 +78,7 @@ export const intializePackage = async (token, status="") => {
     return details;
 }
 
+//Delivery Challan
 export const intializeDeliveryChallan = async (token, status="") => {
     const details = {};
     details.data = await getAllDeliveryChallan(token, status);
@@ -88,6 +94,7 @@ export const intializeDeliveryChallan = async (token, status="") => {
     return details;
 }
 
+//Invoices
 export const intializeInvoice = async (token, status="") => {
     const details = {};
     details.data = await getAllInvoice(token, status);
@@ -103,6 +110,7 @@ export const intializeInvoice = async (token, status="") => {
     return details;
 }
 
+//Sales Returns
 export const intializeSalesReturns = async (token, status="") => {
     const details = {};
     details.data = await getAllSalesReturns(token, status);
@@ -119,6 +127,7 @@ export const intializeSalesReturns = async (token, status="") => {
     return details;
 }
 
+//Credit Notes
 export const intializeCreditNote = async (token, status="") => {
     const details = {};
     details.data = await getAllCreditNotes(token, status);
@@ -128,6 +137,42 @@ export const intializeCreditNote = async (token, status="") => {
     details.search = [{
         title: "Name",
         field: "customerName"
+    }, {
+        title: "Address",
+        field: "addressLine1"
+    }]
+    return details;
+}
+
+//Vendor
+export const intializeVendor = async (token) => {
+    const details = {};
+    details.data = await getVendors(token);
+    details.title = "VENDORS";
+    details.rowHeaders = ["ID", "Goods/Services", "Name", "POC Name",
+        "Address1", "Address2", "Address3", "City", "State",
+        "PIN", "Country", "Email", "POC Email", "Phone No. 1",
+        "Phone No. 2", "POC Contact No.", "Website"];
+    details.search = [{
+        title: "Name",
+        field: "companyName"
+    }, {
+        title: "POC Name",
+        field: "pocName"
+    }]
+    return details;
+}
+
+//Purchase Order
+export const intializePurchaseOrder = async (token, status="") => {
+    const details = {};
+    details.data = await getAllPurchaseOrders(token, status);
+    details.title = "PURCHASE ORDERS";
+    details.rowHeaders = ["ID", "Status", "Vendor ID", "Company Name",
+        "Address", "Order Date", "Exp. Delivery"];
+    details.search = [{
+        title: "Name",
+        field: "companyName"
     }, {
         title: "Address",
         field: "addressLine1"

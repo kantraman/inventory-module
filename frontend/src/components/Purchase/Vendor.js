@@ -1,20 +1,19 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import useToken from '../Admin/useToken';
-import { Form, Row, Button, Modal, Col } from 'react-bootstrap';
+import { Form, Row, Button, Modal } from 'react-bootstrap';
 import Logout from '../Admin/logout';
-import { validateCustomerEntry } from './validateSalesEntry';
+import { validateVendorEntry } from './validatePurchaseEntry';
 import PickList from '../PickList/PickList';
-import { intializeCustomer } from '../PickList/intializeProperties';
-import { getSpecificCustomer } from './loadDataSales';
+import { intializeVendor } from '../PickList/intializeProperties';
 import CountrySelector from '../CountrySelector';
+import { getVendors } from './loadDataPurchase';
 
-const Customer = () => {
+const Vendor = () => {
     const initValues = {
-        customerID: "",
-        title: "",
-        customerName: "",
-        customerType: "",
+        vendorID: "",
+        companyName: "",
+        goodsServices: "",
         addressLine1: "",
         addressLine2: "",
         addressLine3: "",
@@ -25,7 +24,10 @@ const Customer = () => {
         emailID: "",
         contactNo1: "",
         contactNo2: "",
-        website: ""
+        website: "",
+        pocName: "",
+        pocEmail: "",
+        pocContactNo: ""
     };
     const { token } = useToken();
     //Manage Form Field Values
@@ -44,8 +46,8 @@ const Customer = () => {
     const [plProps, setPlProps] = useState({});
     
     const loadPicklistProps = async (token) => {
-        let customersList = await intializeCustomer(token);
-        setPlProps(customersList);
+        let vendorList = await intializeVendor(token);
+        setPlProps(vendorList);
     }
     useEffect(() => loadPicklistProps(token), []);
 
@@ -58,24 +60,26 @@ const Customer = () => {
     //Manage form submit
     const handleSubmit = (event) => {
         event.preventDefault();
-        let validationErrors = validateCustomerEntry(postValues);
+        let validationErrors = validateVendorEntry(postValues);
         setErrorValues(validationErrors);
         if (Object.keys(validationErrors).length === 0)
-            insertCustomer();
+            insertVendor();
     }
 
-    //Load customer details
-    const loadCustDetails = async (customer) => {
-        const custDetails = await getSpecificCustomer(customer[0], token);
-        setPostValues(custDetails);
+    //Load vendor details
+    const loadVendorDetails = async (vendor) => {
+        const vendorDetails = await getVendors(token, vendor[0]);
+        setPostValues(vendorDetails);
     }
 
     //Posting form data to API
-    const insertCustomer = async () => {
-        const customerID = postValues.customerID;
-        const title = postValues.title;
-        const customerName = postValues.customerName;
-        const customerType = postValues.customerType;
+    const insertVendor = async () => {
+        const vendorID = postValues.vendorID;
+        const goodsServices = postValues.goodsServices;
+        const companyName = postValues.companyName;
+        const pocName = postValues.pocName;
+        const pocEmail = postValues.pocEmail;
+        const pocContactNo = postValues.pocContactNo;
         const addressLine1 = postValues.addressLine1;
         const addressLine2 = postValues.addressLine2;
         const addressLine3 = postValues.addressLine3;
@@ -88,11 +92,12 @@ const Customer = () => {
         const contactNo2 = postValues.contactNo2;
         const website = postValues.website;
 
-        let apiURL = "/api/sales/customer";
+        let apiURL = "/api/purchase/vendor";
         var response = "";
         let formValues = {
-            title, customerName, customerType, addressLine1, addressLine2, addressLine3,
-            city, state, pincode, country, emailID, contactNo1, contactNo2, website
+            companyName, goodsServices, addressLine1, addressLine2, addressLine3,
+            city, state, pincode, country, emailID, contactNo1, contactNo2, website,
+            pocName, pocEmail, pocContactNo
         };
         let options = {
             headers: {
@@ -100,8 +105,8 @@ const Customer = () => {
                 'x-access-token': token
             }
         }
-        if (customerID !== "") {
-            apiURL = `/api/sales/customer/${customerID}/update`;
+        if (vendorID !== "") {
+            apiURL = `/api/purchase/vendor/${vendorID}/update`;
             response = await axios.put(apiURL, formValues, options);
         } else {
             response = await axios.post(apiURL, formValues, options);
@@ -110,7 +115,7 @@ const Customer = () => {
             Logout();
         if (response.data.status === "Success") {
             setModalText({
-                header: "Customer",
+                header: "Vendor",
                 body: "Operation completed successfully"
             });
             setPostValues(initValues);
@@ -126,39 +131,18 @@ const Customer = () => {
 
     return (
         <Form className="mx-auto col-lg-6 col-md-8 col-sm-10 p-3 formBg" onSubmit={handleSubmit}>
-            <div className="text-center fs-1 mb-1 formHead">CUSTOMER</div>
+            <div className="text-center fs-1 mb-1 formHead">VENDOR</div>
             <div className="d-flex flex-row align-items-baseline">
                     <Button variant="primary" onClick={() => setPostValues(initValues)}>New Customer</Button>
                 &emsp;
-                    <Form.Label>Select Customer</Form.Label>
+                    <Form.Label>Select Vendor</Form.Label>
                 <PickList title={plProps.title} rowHeaders={plProps.rowHeaders} search={plProps.search}
-                        data={plProps.data} onSelect={loadCustDetails} />
+                        data={plProps.data} onSelect={loadVendorDetails} />
             </div>
             <Row>
-                <Form.Group className="col-md-6  mb-3" controlId="formCustType">
-                    <Form.Label>Customer Type</Form.Label>
-                    <Form.Select name="customerType" value={postValues.customerType} onChange={handleChange} >
-                        <option value="">--Select--</option>
-                        <option value="I">Individual</option>
-                        <option value="C">Company</option>
-                    </Form.Select>
-                    <Form.Text className="text-danger">{errorValues.customerType}</Form.Text>
-                </Form.Group>
-                <Form.Group className="col-md-6  mb-3" controlId="formTitle">
-                    <Form.Label>Title</Form.Label>
-                    <Form.Select name="title" value={postValues.title} onChange={handleChange} >
-                        <option value="">--Select--</option>
-                        <option value="Mr.">Mr.</option>
-                        <option value="Mrs.">Mrs.</option>
-                        <option value="Miss">Miss</option>
-                        <option value="Dr.">Dr.</option>
-                        <option value="M/s.">M/s.</option>
-                    </Form.Select>
-                    <Form.Text className="text-danger">{errorValues.title}</Form.Text>
-                </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formName">
                     <Form.Label>Full Name</Form.Label>
-                    <Form.Control type="text" name="customerName" value={postValues.customerName} onChange={handleChange} placeholder="Customer Name" />
+                    <Form.Control type="text" name="companyName" value={postValues.companyName} onChange={handleChange} placeholder="Company Name" />
                     <Form.Text className="text-danger">{errorValues.customerName}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formAddressLine1">
@@ -186,7 +170,7 @@ const Customer = () => {
                     <Form.Control type="text" name="state" value={postValues.state} onChange={handleChange} placeholder="State" />
                     <Form.Text className="text-danger">{errorValues.state}</Form.Text>
                 </Form.Group>
-                <CountrySelector value={postValues.country} onChange={handleChange} errorMessage={ errorValues.country } />
+                <CountrySelector value={postValues.country} onChange={handleChange} errorMessage={ errorValues.country }/>
                 <Form.Group className="col-md-6 mb-3" controlId="formPincode">
                     <Form.Label>Pin Code</Form.Label>
                     <Form.Control type="number" name="pincode" value={postValues.pincode} onChange={handleChange} placeholder="Pin Code" />
@@ -212,6 +196,26 @@ const Customer = () => {
                     <Form.Control type="text" name="website" value={postValues.website} onChange={handleChange} placeholder="https://www.abc.com" />
                     <Form.Text className="text-danger">{errorValues.website}</Form.Text>
                 </Form.Group>
+                <Form.Group className="col-md-6 mb-3" controlId="formGoods">
+                    <Form.Label>Goods / Services</Form.Label>
+                    <Form.Control type="text" name="goodsServices" value={postValues.goodsServices} onChange={handleChange} placeholder="Goods / Services" />
+                    <Form.Text className="text-danger">{errorValues.goodsServices}</Form.Text>
+                </Form.Group>
+                <Form.Group className="col-md-6 mb-3" controlId="formPOCName">
+                    <Form.Label>Point of Contact Name</Form.Label>
+                    <Form.Control type="text" name="pocName" value={postValues.pocName} onChange={handleChange} placeholder="POC Name" />
+                    <Form.Text className="text-danger">{errorValues.goodsServices}</Form.Text>
+                </Form.Group>
+                <Form.Group className="col-md-6 mb-3" controlId="formPOCEmail">
+                    <Form.Label>Point of Contact Email ID</Form.Label>
+                    <Form.Control type="email" name="pocEmail" value={postValues.pocEmail} onChange={handleChange} placeholder="POC Email ID" />
+                    <Form.Text className="text-danger">{errorValues.pocEmail}</Form.Text>
+                </Form.Group>
+                <Form.Group className="col-md-6 mb-3" controlId="formPOCContactNo">
+                    <Form.Label>Point of Contact Contact No.</Form.Label>
+                    <Form.Control type="text" name="pocContactNo" value={postValues.pocContactNo} onChange={handleChange} placeholder="POC Contact No." />
+                    <Form.Text className="text-danger">{errorValues.pocContactNo}</Form.Text>
+                </Form.Group>
             </Row>
             <div className="d-grid mb-4">
                 <Button variant="primary" type="submit" >Submit</Button>
@@ -231,4 +235,4 @@ const Customer = () => {
     );
 };
 
-export default Customer;
+export default Vendor;

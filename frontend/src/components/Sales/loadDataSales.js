@@ -13,6 +13,7 @@ const handleResponse = (response) => {
         return items;
 };
 
+//Customers
 export const getCustomers = async (token) => {
     const response = await axios.get("/api/sales/customer/A", {
         headers: {
@@ -35,6 +36,7 @@ export const getSpecificCustomer = async (custID, token) => {
     return items[0];
 };
 
+//Salesorder
 export const getSalesOrderDetails = async (salesOrderID, token) => {
     const response = await axios.get(`/api/sales/sales-order/${salesOrderID}`, {
         headers: {
@@ -100,6 +102,7 @@ export const showSalesOrderForm = async (token, salesOrderID) => {
             
 };
 
+//Packages
 export const getAllPackages = async (token, status="") => {
     const allPackages = [];
     const response = await axios.get("/api/sales/package/A", {
@@ -141,6 +144,7 @@ export const getPackageDetails = async (packageID, token) => {
     return items[0];
 };
 
+//Delivery Challan
 export const getAllDeliveryChallan = async (token, status="") => {
     const allChallans = [];
     const response = await axios.get("/api/sales/challan/A", {
@@ -183,6 +187,7 @@ export const getChallanDetails = async (challanID, token) => {
     return items[0];
 };
 
+//Invoice
 export const getAllInvoice = async (token, status="") => {
     const allInvoices = [];
     const response = await axios.get("/api/sales/invoice/A", {
@@ -249,6 +254,7 @@ export const showInvoiceForm = async (token, invoiceID) => {
             
 };
 
+//Sales Returns
 export const getAllSalesReturns = async (token, status="") => {
     const allSalesReturns = [];
     const response = await axios.get("/api/sales/sales-return/A", {
@@ -292,6 +298,7 @@ export const getSalesReturnsDetails = async (salesReturnID, token) => {
     return items[0];
 };
 
+//Credit Notes
 export const getAllCreditNotes = async (token, status="") => {
     const getAllCreditNotes = [];
     const response = await axios.get("/api/sales/credit-note/A", {

@@ -22,6 +22,8 @@ import PaymentReceivedDatewise from './components/Sales/PaymentReceivedDatewise'
 import PaymentsRecTab from "./components/Sales/PaymentsRecTab";
 import SalesReturn from "./components/Sales/SalesReturn";
 import CreditNote from "./components/Sales/CreditNote";
+import Vendor from "./components/Purchase/Vendor";
+import PurchaseOrder from "./components/Purchase/PurchaseOrder";
 
 function App() {
   const { token, setToken } = useToken();
@@ -65,6 +67,8 @@ function App() {
         <Route path="/payments-rec" element={<PaymentsRecTab tab1={<PaymentReceived />} tab2={<PaymentReceivedDatewise />} />} />
         <Route path="/sales-returns" element={<SalesReturn />} />
         <Route path="/credit-note" element={<CreditNote />} />
+        <Route path="/vendor" element={<Vendor />} />
+        <Route path="/purchase-order" element={<PurchaseOrder />} />
       </Routes>
     </div>
   );

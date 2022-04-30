@@ -1,3 +1,4 @@
+//Customer
 export const validateCustomerEntry = (formValues) => {
     const errors = {};
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -31,6 +32,7 @@ export const validateCustomerEntry = (formValues) => {
     return errors;
 }
 
+//Sales order
 export const validateSalesOrder = (formValues) => {
     const errors = {};
 
@@ -46,6 +48,7 @@ export const validateSalesOrder = (formValues) => {
     return errors;
 }
 
+//Package
 export const validatePackage = (formValues) => {
     const errors = {};
 
@@ -61,6 +64,7 @@ export const validatePackage = (formValues) => {
     return errors;
 }
 
+//Delivery Challan
 export const validateDeliveryChallan = (formValues) => {
     const errors = {};
 
@@ -80,6 +84,7 @@ export const validateDeliveryChallan = (formValues) => {
     return errors;
 }
 
+//Invoice
 export const validateInvoice = (formValues) => {
     const errors = {};
 
@@ -99,6 +104,7 @@ export const validateInvoice = (formValues) => {
     return errors;
 }
 
+//Payments received
 export const validatePaymentsRec = (formValues) => {
     const errors = {};
 
@@ -116,6 +122,7 @@ export const validatePaymentsRec = (formValues) => {
     return errors;
 }
 
+//Sales Returns
 export const validateSalesReturns = (formValues, returnItems) => {
     const errors = {};
     let blnValid = true;
@@ -150,6 +157,7 @@ export const validateSalesReturns = (formValues, returnItems) => {
     return errors;
 }
 
+//Credit Note
 export const validateCreditNote = (formValues) => {
     const errors = {};
 

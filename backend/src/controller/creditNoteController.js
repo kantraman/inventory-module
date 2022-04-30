@@ -49,8 +49,11 @@ const updateCreditNote = (req, res) => {
                 invoiceID: req.body.invoiceID,
                 refNo: req.body.refNo,
                 amount: req.body.amount,
-                status: "Draft"
+                status: req.body.status
             }
+        }  else {
+            if (req.body.status === "Draft")
+                return res.json({ status: "Error", message: "Cannot be updated to draft." });
         }
         if (!isNaN(creditNoteID) && creditNoteID !== undefined) {
             CreditNotes.updateOne({creditNoteID: creditNoteID }, updateItem, null)

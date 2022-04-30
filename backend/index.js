@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 8000;
 const userAccountsRouter = require("./src/routes/userAccountsRouter");
 const inventoryRouter = require("./src/routes/inventoryRouter");
 const salesRouter = require("./src/routes/salesRouter");
+const purchaseRouter = require("./src/routes/purchaseRouter");
 
 dotenv.config();
 app.use(express.urlencoded({ extended: true }));
@@ -19,6 +20,7 @@ app.use(cors());
 app.use("/api/admin", userAccountsRouter);
 app.use("/api/inventory", inventoryRouter);
 app.use("/api/sales", salesRouter);
+app.use("/api/purchase", purchaseRouter)
 
 // app.use(express.static(path.resolve(__dirname, "./client")));
 // app.get("*", (req, res) => {
@@ -28,7 +30,6 @@ app.use(express.static(__dirname + '/public'));
 app.use('/uploads', express.static('uploads'));
 
 app.use((err, req, res, next) => {
-  
   if (!res.headersSent)
     res.status(err.status || 500)
     res.send({

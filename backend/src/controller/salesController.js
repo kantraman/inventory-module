@@ -35,13 +35,23 @@ const insertSalesOrder = (req, res) => {
 const updateSalesOrder = (req, res) => {
     try {
         const sID = req.params.id;
+        let status = SalesOrder.findOne({ salesOrderID: sID }).then(true);
+        
         var updateItem = {
-            customerID: req.body.customerID,
-            orderDate: req.body.orderDate,
-            items: req.body.items,
             status: req.body.status
         };
-        if (updateItem.customerID !== "" && updateItem.customerID !== undefined && sID !== "") {
+        if (status.status === "Draft") {
+            var updateItem = {
+                customerID: req.body.customerID,
+                orderDate: req.body.orderDate,
+                items: req.body.items,
+                status: req.body.status
+            };
+        } else {
+            if (req.body.status === "Draft")
+                return res.json({ status: "Error", message: "Cannot be updated to draft." });
+        }
+        if (sID !== "" && sID !== undefined) {
             SalesOrder.findOneAndUpdate({ salesOrderID: sID }, updateItem, null)
                 .then(res.json({status: "Success"}))
                 .catch((er) => {
