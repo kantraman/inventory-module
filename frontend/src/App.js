@@ -24,6 +24,8 @@ import SalesReturn from "./components/Sales/SalesReturn";
 import CreditNote from "./components/Sales/CreditNote";
 import Vendor from "./components/Purchase/Vendor";
 import PurchaseOrder from "./components/Purchase/PurchaseOrder";
+import PurchaseOrderDatewise from "./components/Purchase/PurchaseOrderVendorDatewise";
+import Bill from "./components/Purchase/BillsPayable";
 
 function App() {
   const { token, setToken } = useToken();
@@ -56,7 +58,8 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/item-group" element={<ItemGroup />} />
         <Route path="/item" element={<Items />} />
-        <Route path="/inv-adjustment" element={<PaymentsRecTab tab1={<InventoryAdj />} tab2={ <ItemAdjDatewise /> }/> }/>
+        <Route path="/inv-adjustment" element={<PaymentsRecTab tab1={<InventoryAdj />}
+          tab2={<ItemAdjDatewise />} />} />
         <Route path="/customer" element={<Customer />} />
         <Route path="/Logout" element={<Logout />} />
         <Route path="/sales-order" element={<SalesOrder />} />
@@ -64,11 +67,14 @@ function App() {
         <Route path="/package" element={<Package />} />
         <Route path="/challan" element={<DeliveryChallan />} />
         <Route path="/invoice" element={<Invoice />} />
-        <Route path="/payments-rec" element={<PaymentsRecTab tab1={<PaymentReceived />} tab2={<PaymentReceivedDatewise />} />} />
+        <Route path="/payments-rec" element={<PaymentsRecTab tab1={<PaymentReceived />}
+          tab2={<PaymentReceivedDatewise />} />} />
         <Route path="/sales-returns" element={<SalesReturn />} />
         <Route path="/credit-note" element={<CreditNote />} />
         <Route path="/vendor" element={<Vendor />} />
-        <Route path="/purchase-order" element={<PurchaseOrder />} />
+        <Route path="/purchase-order" element={<PaymentsRecTab tab1={<PurchaseOrder />}
+          tab2={<PurchaseOrderDatewise />} />} />
+        <Route path="/bills" element={<Bill />} />
       </Routes>
     </div>
   );

@@ -139,10 +139,79 @@ const getPurchaseOrderForm = async (req, res) => {
     }
 }
 
+//Get purchase orders vendorwise and itemwise
+const getPurchaseOrderVendorItemwise = async (req, res) => {
+    try {
+        let typeWise = req.query.type;
+        let ID = req.query.ID;
+        let fromDate = new Date(req.query.fromDate);
+        let toDate = new Date(req.query.toDate);
+
+        toDate.setDate(toDate.getDate() + 1);
+
+        const periodFilter = {
+            orderDate: {
+                $gte: fromDate,
+                $lt: toDate
+            },
+        };
+        let filter = {
+            "items.itemID": Number(ID)
+        }
+        if (typeWise === "V")
+            filter = {
+                ...periodFilter,
+                vendorID: Number(ID)
+            };
+        const lookupQ = {
+            from: "vendors",
+            localField: "vendorID",
+            foreignField: "vendorID",
+            as: "vendorDetails"
+        };
+        let purchaseOrder = "";
+        if (ID && ID !== undefined) {
+            if (typeWise !== "V") {
+                purchaseOrder = await PurchaseOrder
+                    .aggregate()
+                    .match(periodFilter)
+                    .lookup(lookupQ)
+                    .unwind({
+                        path: "$items",
+                        includeArrayIndex: 'string',
+                        preserveNullAndEmptyArrays: true
+                    })
+                    .match(filter);
+            } else {
+                purchaseOrder = await PurchaseOrder
+                    .aggregate()
+                    .match(filter)
+                    .lookup(lookupQ)
+                    .unwind({
+                        path: "$items",
+                        includeArrayIndex: 'string',
+                        preserveNullAndEmptyArrays: true
+                    });
+            }
+        }
+        if (purchaseOrder.length > 0) {
+            res.json(purchaseOrder);
+        } else {
+            res.json({ status: "Error", message: "No records found" });
+        }
+
+    } catch (err) {
+        console.log(err);
+        if (!res.headersSent)
+            res.json({ status: "Error", message: err.message });
+    }
+}
+
 
 module.exports = {
     insertPurchaseOrder,
     updatePurchaseOrder,
     getPurchaseOrder,
-    getPurchaseOrderForm
+    getPurchaseOrderForm,
+    getPurchaseOrderVendorItemwise
 };

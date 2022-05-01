@@ -2,19 +2,22 @@ const mongoose = require('mongoose');
 const AddedItem = require('./AddedItem');
 const Schema = mongoose.Schema;
 
-const InvoiceSchema = new Schema({
-    invoiceID: {
+const BillsPayableSchema = new Schema({
+    billID: {
         type: Number,
         unique: true
     },
-    customerID: {
+    vendorID: {
         type: Number,
         required: true
     },
-    salesOrderID: {
+    purchaseOrderID: {
         type: Number,
     },
-    invoiceDate: {
+    refNo: {
+        type: String
+    },
+    billDate: {
         type: Date,
         required: true
     },
@@ -27,7 +30,10 @@ const InvoiceSchema = new Schema({
         required: true
     },
     otherCharges: {
-        type: Number,
+        type: Number
+    },
+    discount: {
+        type: Number
     },
     status: {
         type: String,
@@ -35,12 +41,12 @@ const InvoiceSchema = new Schema({
     }
 });
 
-//Generate Invoice ID
-InvoiceSchema.pre("save", async function (next) {
+//Generate Bill ID
+BillsPayableSchema.pre("save", async function (next) {
     try {
         if (this.isNew) {
-            let total = await Invoices.find().sort({ invoiceID: -1 }).limit(1);
-            this.invoiceID = total.length === 0 ? 1 : Number(total[0].invoiceID) + 1;
+            let total = await Bills.find().sort({ invoiceID: -1 }).limit(1);
+            this.billID = total.length === 0 ? 1 : Number(total[0].billID) + 1;
         }
         next()
     } catch (error) {
@@ -48,5 +54,5 @@ InvoiceSchema.pre("save", async function (next) {
     }
 })
 
-const Invoices = mongoose.model("invoice", InvoiceSchema);
-module.exports = Invoices;
+const Bills = mongoose.model("bill", BillsPayableSchema);
+module.exports = Bills;

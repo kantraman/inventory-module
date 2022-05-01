@@ -1,5 +1,5 @@
 import { getItemByGroups } from "../Items/loadItems";
-import { getAllPurchaseOrders, getVendors } from "../Purchase/loadDataPurchase";
+import { getAllBills, getAllPurchaseOrders, getVendors } from "../Purchase/loadDataPurchase";
 import {
     getAllSalesOrders,
     getCustomers,
@@ -179,3 +179,21 @@ export const intializePurchaseOrder = async (token, status="") => {
     }]
     return details;
 }
+
+//Bill
+export const intializeBills = async (token, status="") => {
+    const details = {};
+    details.data = await getAllBills(token, status);
+    details.title = "BILLS";
+    details.rowHeaders = ["ID", "Ref. No.", "Status", "Vendor ID", "Company Name",
+        "Address", "Bill Date", "Due date", "PO ID"];
+    details.search = [{
+        title: "Name",
+        field: "companyName"
+    }, {
+        title: "Address",
+        field: "addressLine1"
+    }]
+    return details;
+}
+

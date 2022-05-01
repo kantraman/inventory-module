@@ -62,7 +62,7 @@ export const getAllPurchaseOrders = async (token, status="") => {
             expectedDate: formatDateFromDB(item.expectedDate)
         };
         if (status !== "") {
-            if (item.status === status)
+            if (status.indexOf(item.status) > -1)
                 allPurchaseOrders.push(purchaseOrder);
         } else {
             allPurchaseOrders.push(purchaseOrder);
@@ -93,5 +93,51 @@ export const showPurchaseOrderForm = async (token, purchaseOrderID) => {
         window.alert("An error occured while getting data.");
     }
             
+};
+
+//Bills
+export const getBillDetails = async (billID, token) => {
+    const response = await axios.get(`/api/purchase/bill/${billID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    
+    let items = handleResponse(response);
+    return items[0];
+};
+
+export const getAllBills = async (token, status="") => {
+    const allBills = [];
+    const response = await axios.get("/api/purchase/bill/A", {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    
+    items.forEach((item) => {
+        let bill = {
+            billID: item.billID,
+            refNo: item.refNo,
+            status: item.status,
+            vendorID: item.vendorID,
+            companyName: item.vendorDetails[0].companyName,
+            addressLine1: item.vendorDetails[0].addressLine1,
+            billDate: formatDateFromDB(item.billDate),
+            dueDate: formatDateFromDB(item.dueDate),
+            purchaseOrderID: item.purchaseOrderID,
+        };
+        if (status !== "") {
+            if (item.status === status)
+                allBills.push(bill);
+        } else {
+            allBills.push(bill);
+        }
+    })
+    
+    return allBills;
 };
 

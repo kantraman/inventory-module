@@ -41,6 +41,7 @@ const NavBar = ({ visible }) => {
                         <NavDropdown title="Purchase" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/vendor">Vendor</NavDropdown.Item>
                             <NavDropdown.Item href="/purchase-order">Purchase Order</NavDropdown.Item>
+                            <NavDropdown.Item href="/bills">Bill</NavDropdown.Item>
                         </NavDropdown>
                         
                         <Nav.Link href="/Logout">Log Out</Nav.Link>

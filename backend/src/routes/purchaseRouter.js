@@ -10,8 +10,14 @@ const {
     insertPurchaseOrder,
     updatePurchaseOrder,
     getPurchaseOrder,
-    getPurchaseOrderForm
+    getPurchaseOrderForm,
+    getPurchaseOrderVendorItemwise
 } = require("../controller/purchaseController");
+const {
+    insertBill,
+    updateBillStatus,
+    getBill
+} = require("../controller/billsController");
 
 const purchaseRouter = express.Router();
 
@@ -23,7 +29,13 @@ purchaseRouter.get("/vendor/:id", auth, (req, res) => getVendor(req, res));
 //Purchase Order
 purchaseRouter.post("/purchase-order", auth, (req, res) => insertPurchaseOrder(req, res));
 purchaseRouter.put("/purchase-order/:id/update", auth, (req, res) => updatePurchaseOrder(req, res));
+purchaseRouter.get("/purchase-order", auth, (req, res) => getPurchaseOrderVendorItemwise(req, res));
 purchaseRouter.get("/purchase-order/:id", auth, (req, res) => getPurchaseOrder(req, res));
 purchaseRouter.get("/po-form/:id", auth, (req, res) => getPurchaseOrderForm(req, res));
+
+//Bills
+purchaseRouter.post("/bill", auth, (req, res) => insertBill(req, res));
+purchaseRouter.put("/bill/:id/update", auth, (req, res) => updateBillStatus(req, res));
+purchaseRouter.get("/bill/:id", auth, (req, res) => getBill(req, res));
 
 module.exports = purchaseRouter;

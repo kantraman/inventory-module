@@ -60,3 +60,25 @@ export const validatePurchaseOrder = (formValues) => {
    
     return errors;
 }
+
+//Bills
+export const validateBills = (formValues) => {
+    const errors = {};
+
+    if (!formValues.vendorID)
+        errors.companyName = "Vendor details is required.";
+    if (!formValues.status)
+        errors.status = "Status is required.";
+    if (formValues.items.length === 0)
+        errors.items = "Select the items.";
+    if (!formValues.billDate)
+        errors.billDate = "Bill date is required.";
+    if (!formValues.dueDate)
+        errors.dueDate = "Bill due date is required.";
+    if (isNaN(formValues.otherCharges))
+        errors.otherCharges = "Invalid other charges";
+    if (isNaN(formValues.discount))
+        errors.discount = "Invalid discount";
+    
+    return errors;
+}

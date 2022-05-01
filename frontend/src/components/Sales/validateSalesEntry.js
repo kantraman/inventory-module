@@ -97,9 +97,9 @@ export const validateInvoice = (formValues) => {
     if (!formValues.invoiceDate)
         errors.invoiceDate = "Invoice date is required.";
     if (!formValues.dueDate)
-        errors.invoiceDate = "Invoice due date is required.";
+        errors.dueDate = "Invoice due date is required.";
     if (isNaN(formValues.otherCharges))
-        errors.challanType = "Invalid other charges";
+        errors.otherCharges = "Invalid other charges";
     
     return errors;
 }
