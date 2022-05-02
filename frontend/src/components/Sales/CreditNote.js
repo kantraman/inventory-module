@@ -204,12 +204,12 @@ const CreditNote = () => {
                 <Form.Group className="col-md-6 mb-1" controlId="formRefNo">
                     <Form.Label>Reference No.</Form.Label>
                     <Form.Control type="text" name="refNo" value={postValues.refNo} onChange={handleChange} placeholder="Reference No."/>
-                    <Form.Text className="text-danger">{errorValues.reason}</Form.Text>
+                    <Form.Text className="text-danger">{errorValues.refNo}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formAmount">
                     <Form.Label>Amount</Form.Label>
                     <Form.Control type="number" name="amount" value={postValues.amount} onChange={handleChange} placeholder="Amount"/>
-                    <Form.Text className="text-danger">{errorValues.reason}</Form.Text>
+                    <Form.Text className="text-danger">{errorValues.amount}</Form.Text>
                 </Form.Group>
             </Row>
             <div className="d-grid mb-4">

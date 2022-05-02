@@ -18,6 +18,15 @@ const {
     updateBillStatus,
     getBill
 } = require("../controller/billsController");
+const {
+    insertBillPayment,
+    getBillPayment4Period
+} = require("../controller/billPaymentController");
+const {
+    insertVendorCreditNote,
+    updateVendorCreditNote,
+    getVendorCreditNote
+} = require("../controller/vendorCreditNoteController");
 
 const purchaseRouter = express.Router();
 
@@ -37,5 +46,14 @@ purchaseRouter.get("/po-form/:id", auth, (req, res) => getPurchaseOrderForm(req,
 purchaseRouter.post("/bill", auth, (req, res) => insertBill(req, res));
 purchaseRouter.put("/bill/:id/update", auth, (req, res) => updateBillStatus(req, res));
 purchaseRouter.get("/bill/:id", auth, (req, res) => getBill(req, res));
+
+//Bills Payment
+purchaseRouter.post("/bill-payment", auth, (req, res) => insertBillPayment(req, res));
+purchaseRouter.get("/bill-payment", auth, (req, res) => getBillPayment4Period(req, res));
+
+//Vendor Credit Note
+purchaseRouter.post("/vendor-credit", auth, (req, res) => insertVendorCreditNote(req, res));
+purchaseRouter.put("/vendor-credit/:id/update", auth, (req, res) => updateVendorCreditNote(req, res));
+purchaseRouter.get("/vendor-credit/:id", auth, (req, res) => getVendorCreditNote(req, res));
 
 module.exports = purchaseRouter;

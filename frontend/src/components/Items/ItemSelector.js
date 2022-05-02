@@ -28,13 +28,13 @@ const ItemSelector = ({
         prefVendor: "",
         itemImg: "",
         filepreview: null,
-        quantity: 0
+        quantity: 0,
     };
     //Manage Form Field Values
     const [itemDetails, setItemDetails] = useState(initValues);
     const [itemGroups, setItemGroups] = useState([]);
-    const [selected, setSelected] = useState("");
-
+    const [selected, setSelected] = useState({});
+    
     //Picklist 
     const [plItems, setPlItems] = useState({});
 
@@ -66,16 +66,27 @@ const ItemSelector = ({
     function handleChange(event) {
         const { name, value } = event.target;
         setItemDetails({ ...itemDetails, [name]: value });
-    }
+    };
 
     //Select table row
     const selectRow = (event) => {
-        let target = event.target.parentNode
+        let target = event.target.parentNode;
         let itemID = target.getElementsByTagName("td")[0].innerHTML;
-        setSelected(itemID);
+        if (Object.keys(selected).length > 0)
+            selected.element.style.color = "white";
+        setSelected({ item: itemID, element: target });
         target.style.color = "red";
+    };
+    
+    //Calculate Total
+    function calculateTotal(){
+        let total = 0;
+        if (postValues.items)
+            postValues.items.forEach((item) => {
+                total += Number(item.total);
+            });
+        return Number(total).toFixed(2);
     }
-
     //Add item
     const addItem = () => {
         const price = (mode === "S") ? "sellingPrice" : "costPrice";
@@ -110,16 +121,18 @@ const ItemSelector = ({
     const deleteItem = () => {
         let arr = postValues.items
         let i = arr.length - 1;
-        
+        if (Object.keys(selected).length > 0)
+            selected.element.style.color = "white";
         while (i >= 0) {
-            if (arr[i]["itemID"] === Number(selected)) {
+            if (arr[i]["itemID"] === Number(selected.item)) {
                 arr.splice(i, 1);
             }
             i--
         }
         postValues.items = arr;
         setPostValues({ ...postValues });
-        setSelected("");
+        
+        setSelected({});
     }
 
     return (
@@ -198,9 +211,13 @@ const ItemSelector = ({
                             </tr>
                         )
                     })}
+                    <tr>
+                        <td colSpan={5} className="text-end"> Grand Total : </td>
+                        <td className="text-end">{calculateTotal()}</td>
+                    </tr>
                 </tbody>
             </Table>
-            
+           
         </>
     );
 };

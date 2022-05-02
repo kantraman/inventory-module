@@ -32,10 +32,10 @@ const insertSalesOrder = (req, res) => {
 };
 
 //Update Sales Order
-const updateSalesOrder = (req, res) => {
+const updateSalesOrder = async (req, res) => {
     try {
         const sID = req.params.id;
-        let status = SalesOrder.findOne({ salesOrderID: sID }).then(true);
+        let status = await SalesOrder.findOne({ salesOrderID: sID });
         
         var updateItem = {
             status: req.body.status

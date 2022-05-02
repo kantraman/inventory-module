@@ -34,11 +34,10 @@ const insertPurchaseOrder = (req, res) => {
 };
 
 //Update Purchase Order
-const updatePurchaseOrder = (req, res) => {
+const updatePurchaseOrder = async (req, res) => {
     try {
         const pOID = req.params.id;
-        let status = PurchaseOrder.findOne({ purchaseOrderID: pOID }).then(true);
-        
+        let status = await PurchaseOrder.findOne({ purchaseOrderID: pOID });
         var updateItem = {
             status: req.body.status
         };

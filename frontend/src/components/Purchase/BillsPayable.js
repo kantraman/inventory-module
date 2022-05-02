@@ -9,7 +9,7 @@ import { intializeVendor, intializePurchaseOrder, intializeBills } from '../Pick
 import { getBillDetails, getVendors, getPurchaseOrderDetails} from './loadDataPurchase';
 import PreLoader from '../PreLoader';
 import ItemSelector from '../Items/ItemSelector';
-import { formatDate } from '../../utility';
+import { formatDate, formatNum } from '../../utility';
 
 const Bill = () => {
     const initValues = {
@@ -85,8 +85,8 @@ const Bill = () => {
             status: bill.status,
             billDate: bill.billDate.substring(0, 10),
             dueDate: bill.dueDate.substring(0, 10),
-            otherCharges: bill.otherCharges,
-            discount: bill.discount,
+            otherCharges: formatNum(bill.otherCharges),
+            discount: formatNum(bill.discount),
             items: bill.items
         };
         setPostValues(postData);

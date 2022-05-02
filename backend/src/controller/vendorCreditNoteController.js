@@ -1,19 +1,19 @@
-const CreditNotes = require("../model/CreditNote");
+const VendorCreditNotes = require("../model/VendorCreditNote");
 
-//Insert credit note
-const insertCreditNote = (req, res) => {
+//Insert vendor credit note
+const insertVendorCreditNote = (req, res) => {
     try {
         var item = {
             creditNoteDate: req.body.creditNoteDate,
-            customerID: req.body.customerID,
-            salesReturnID: req.body.salesReturnID,
-            invoiceID: req.body.invoiceID,
+            vendorID: req.body.vendorID,
             refNo: req.body.refNo,
             amount: req.body.amount,
+            discount: req.body.discount,
+            items: req.body.items,
             status: "Draft"
         }
-        if (item.customerID !== "" && item.customerID !== undefined) {
-            const creditNote = new CreditNotes(item);
+        if (item.vendorID !== "" && item.vendorID !== undefined) {
+            const creditNote = new VendorCreditNotes(item);
             creditNote.save()
                 .then(() => {
                     res.json({ status: "Success" });
@@ -32,11 +32,11 @@ const insertCreditNote = (req, res) => {
     }
 };
 
-//Update Credit Note 
-const updateCreditNote = async (req, res) => {
+//Update vendor credit note
+const updateVendorCreditNote = async (req, res) => {
     try {
         const creditNoteID = Number(req.params.id);
-        let status = await CreditNotes.findOne({ creditNoteID: creditNoteID });
+        let status = await VendorCreditNotes.findOne({ creditNoteID: creditNoteID });
         
         var updateItem = {
             status: req.body.status
@@ -44,11 +44,11 @@ const updateCreditNote = async (req, res) => {
         if (status.status === "Draft") {
             updateItem = {
                 creditNoteDate: req.body.creditNoteDate,
-                customerID: req.body.customerID,
-                salesReturnID: req.body.salesReturnID,
-                invoiceID: req.body.invoiceID,
+                vendorID: req.body.vendorID,
                 refNo: req.body.refNo,
                 amount: req.body.amount,
+                discount: req.body.discount,
+                items: req.body.items,
                 status: req.body.status
             }
         }  else {
@@ -56,7 +56,7 @@ const updateCreditNote = async (req, res) => {
                 return res.json({ status: "Error", message: "Cannot be updated to draft." });
         }
         if (!isNaN(creditNoteID) && creditNoteID !== undefined) {
-            CreditNotes.updateOne({creditNoteID: creditNoteID }, updateItem, null)
+            VendorCreditNotes.updateOne({creditNoteID: creditNoteID }, updateItem, null)
                 .then(res.json({ status: "Success" }))
                 .catch((er) => {
                     if (!res.headersSent)
@@ -71,25 +71,25 @@ const updateCreditNote = async (req, res) => {
     }
 };
 
-//Get Credit Note Details
-const getCreditNote = async (req, res) => {
+//Get vendor credit note details
+const getVendorCreditNote = async (req, res) => {
     try {
         let creditNoteID = req.params.id;
         let creditNote = "";
         const lookupQ = {
-            from: "customers",
-            localField: "customerID",
-            foreignField: "customerID",
-            as: "custDetails"
+            from: "vendors",
+            localField: "vendorID",
+            foreignField: "vendorID",
+            as: "vendorDetails"
         };
         
         if (creditNoteID === "A") {
-            creditNote = await CreditNotes
+            creditNote = await VendorCreditNotes
                 .aggregate()
                 .lookup(lookupQ)
                 .sort({ creditNoteDate: -1 });
         } else {
-            creditNote = await CreditNotes
+            creditNote = await VendorCreditNotes
                 .aggregate()
                 .match({ creditNoteID: Number(creditNoteID) })
                 .lookup(lookupQ)
@@ -108,7 +108,7 @@ const getCreditNote = async (req, res) => {
 };
 
 module.exports = {
-    insertCreditNote,
-    updateCreditNote,
-    getCreditNote
+    insertVendorCreditNote,
+    updateVendorCreditNote,
+    getVendorCreditNote
 }

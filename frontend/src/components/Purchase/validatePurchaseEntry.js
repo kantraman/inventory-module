@@ -82,3 +82,21 @@ export const validateBills = (formValues) => {
     
     return errors;
 }
+
+//Bills Payment
+export const validatePayments = (formValues) => {
+    const errors = {};
+
+    if (!formValues.vendorID)
+        errors.customerName = "Vendor details is required.";
+    if (!formValues.modeOfPayment)
+        errors.modeOfPayment = "Mode of payment is required.";
+    if (!formValues.paymentDate)
+        errors.paymentRecDate = "Payment date is required.";
+    if (!formValues.amount || Number(formValues.amount ) <= 0)
+        errors.amount = "Paid amount is required.";
+    if (isNaN(formValues.otherCharges))
+        errors.bankCharges = "Invalid other charges";
+    
+    return errors;
+}

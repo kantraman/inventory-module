@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const AddedItem = require('./AddedItem');
 
-const CreditNoteSchema = new Schema({
+const VendorCreditNoteSchema = new Schema({
     creditNoteID: {
         type: Number,
         unique: true
@@ -10,15 +11,7 @@ const CreditNoteSchema = new Schema({
         type: Date,
         required: true
     },
-    customerID: {
-        type: Number,
-        required: true
-    },
-    salesReturnID: {
-        type: Number,
-        unique: true
-    },
-    invoiceID: {
+    vendorID: {
         type: Number,
         required: true
     },
@@ -26,9 +19,16 @@ const CreditNoteSchema = new Schema({
         type: String,
         required: true
     },
+    items: {
+        type: [AddedItem],
+        required: true
+    },
     amount: {
         type: Number,
         required: true
+    },
+    discount: {
+        type: Number
     },
     status: {
         type: String,
@@ -37,10 +37,10 @@ const CreditNoteSchema = new Schema({
 });
 
 //Generate Credit Note ID
-CreditNoteSchema.pre("save", async function (next) {
+VendorCreditNoteSchema.pre("save", async function (next) {
     try {
         if (this.isNew) {
-            let total = await CreditNotes.find().sort({ creditNoteID: -1 }).limit(1);
+            let total = await VendorCreditNotes.find().sort({ creditNoteID: -1 }).limit(1);
             this.creditNoteID = total.length === 0 ? 1 : Number(total[0].creditNoteID) + 1;
         }
         next()
@@ -49,5 +49,5 @@ CreditNoteSchema.pre("save", async function (next) {
     }
 })
 
-const CreditNotes = mongoose.model("creditnote", CreditNoteSchema);
-module.exports = CreditNotes;
+const VendorCreditNotes = mongoose.model("vendorcreditnote", VendorCreditNoteSchema);
+module.exports = VendorCreditNotes;

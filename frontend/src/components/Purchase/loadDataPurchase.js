@@ -131,7 +131,7 @@ export const getAllBills = async (token, status="") => {
             purchaseOrderID: item.purchaseOrderID,
         };
         if (status !== "") {
-            if (item.status === status)
+            if (status.indexOf(item.status) > -1)
                 allBills.push(bill);
         } else {
             allBills.push(bill);

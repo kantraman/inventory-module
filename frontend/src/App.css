@@ -1,3 +1,6 @@
+body{
+  background-color: peachpuff!important;
+}
 .formHead{
   background-color: midnightblue;
   padding: 5px;
@@ -14,6 +17,7 @@
 .formHeadPill{
   color: white;
   background-color: peachpuff;
+  border-bottom: 1px inset #4e4c4c;
 }
 
 .cover{
