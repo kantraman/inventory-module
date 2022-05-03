@@ -11,6 +11,7 @@ const userAccountsRouter = require("./src/routes/userAccountsRouter");
 const inventoryRouter = require("./src/routes/inventoryRouter");
 const salesRouter = require("./src/routes/salesRouter");
 const purchaseRouter = require("./src/routes/purchaseRouter");
+const dashboardRouter = require("./src/routes/dashboardRouter");
 
 dotenv.config();
 app.use(express.urlencoded({ extended: true }));
@@ -20,7 +21,8 @@ app.use(cors());
 app.use("/api/admin", userAccountsRouter);
 app.use("/api/inventory", inventoryRouter);
 app.use("/api/sales", salesRouter);
-app.use("/api/purchase", purchaseRouter)
+app.use("/api/purchase", purchaseRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 // app.use(express.static(path.resolve(__dirname, "./client")));
 // app.get("*", (req, res) => {
@@ -39,7 +41,7 @@ app.use((err, req, res, next) => {
       },
     });
   })
-  
+
 
 mongoose.connect(process.env.DBConnectionString, {
     useNewUrlParser: true,
@@ -48,5 +50,3 @@ mongoose.connect(process.env.DBConnectionString, {
     .then(app.listen(PORT, () =>
         console.log(`Server listening on PORT ${PORT}`)))
     .catch((err) => console.log(err));
-
-

@@ -3,25 +3,26 @@ import React, { useEffect, useState } from 'react';
 import useToken from '../Admin/useToken';
 import { Form, Row, Button, Modal} from 'react-bootstrap';
 import Logout from '../Admin/logout';
-import { validateCreditNote } from './validateSalesEntry';
+import { validateVendorCreditNote } from './validatePurchaseEntry';
 import PickList from '../PickList/PickList';
-import { intializeSalesReturns, intializeCreditNote } from '../PickList/intializeProperties';
-import { getSalesReturnsDetails, getCreditNoteDetails } from './loadDataSales';
+import { intializeVendor, intializeVendorCreditNote } from '../PickList/intializeProperties';
+import { getVendorCreditNoteDetails, getVendors } from './loadDataPurchase'
 import PreLoader from '../PreLoader';
 import { formatDate, formatNum } from '../../utility';
+import ItemSelector from '../Items/ItemSelector';
  
-const CreditNote = () => {
+const VendorCreditNote = () => {
     const initValues = {
         creditNoteID: "",
-        salesReturnID: "",
-        invoiceID: "",
-        customerID: "",
-        customerName: "",
-        addressLine1: "",
+        vendorID: "",
+        companyName: "",
         status: "Draft",
         refNo: "",
         creditNoteDate: formatDate(new Date(Date.now()).toLocaleDateString("en-UK")),
         amount: "0.00",
+        discount: "0.00",
+        otherCharges: "0.00",
+        items: []
     };
     const { token } = useToken();
     //Manage Form Field Values
@@ -37,17 +38,17 @@ const CreditNote = () => {
     const handleShow = () => setShow(true);
 
     //Picklist properties
-    const [plSalesReturns, setPlSalesReturns] = useState({});
     const [plCreditNote, setPlCreditNote] = useState({});
+    const [plVendor, setPlVendor] = useState({});
     
     //To show preloader
     const [loading, setLoading] = useState(true);
     
     const loadPicklistProps = async (token) => {
-        let creditNoteList = await intializeCreditNote(token);
+        let creditNoteList = await intializeVendorCreditNote(token);
         setPlCreditNote(creditNoteList);
-        let salesReturnsList = await intializeSalesReturns(token);
-        setPlSalesReturns(salesReturnsList);
+        let vendorList = await intializeVendor(token);
+        setPlVendor(vendorList);
         setLoading(false);
     }
     useEffect(() => loadPicklistProps(token), []);
@@ -61,7 +62,7 @@ const CreditNote = () => {
     //Manage form submit
     const handleSubmit = async (event) => {
         event.preventDefault();
-        let validationErrors = validateCreditNote(postValues);
+        let validationErrors = validateVendorCreditNote(postValues);
         setErrorValues(validationErrors);
         if (Object.keys(validationErrors).length === 0)
             insertCreditNote();
@@ -69,64 +70,49 @@ const CreditNote = () => {
 
     //Load credit note details
     const loadCreditNote = async (selCreditNote) => {
-        const creditNote = await getCreditNoteDetails(selCreditNote[0], token);
+        const creditNote = await getVendorCreditNoteDetails(selCreditNote[0], token);
         const postData = {
             creditNoteID: creditNote.creditNoteID,
-            salesReturnID: creditNote.salesReturnID,
-            invoiceID: creditNote.invoiceID,
-            customerID: creditNote.customerID,
-            customerName: creditNote.custDetails[0].customerName,
-            addressLine1: creditNote.custDetails[0].addressLine1,
+            vendorID: creditNote.vendorID,
+            companyName: creditNote.vendorDetails[0].companyName,
             status: creditNote.status,
             refNo: creditNote.refNo,
             creditNoteDate: creditNote.creditNoteDate.substring(0, 10),
-            amount:  formatNum(creditNote.amount)
+            amount: formatNum(creditNote.amount),
+            otherCharges: formatNum(creditNote.otherCharges),
+            discount: formatNum(creditNote.discount),
+            items: creditNote.items
         }
         if (postData.status !== "Draft")
             window.alert("Only status can be updated.");
         setPostValues(postData);
     }
+
+     //Load vendor details
+     const loadVendorDetails = async (vendor) => {
+        const vendorDetails = await getVendors(token, vendor[0]);
+        const postData = { ...postValues, ...vendorDetails };
+        postData.purchaseOrderID = "0";
+        postData.items = [];
+        setPostValues(postData);
+    }
     
-    //Load Sales Returns details
-    const loadSalesReturns = async (selSalsReturns) => {
-        const salesReturns = await getSalesReturnsDetails(selSalsReturns[0], token);
-        const postData = {
-            salesReturnID: salesReturns.salesReturnID,
-            invoiceID: salesReturns.invoiceID,
-            customerID: salesReturns.customerID,
-            customerName: salesReturns.custDetails[0].customerName,
-            addressLine1: salesReturns.custDetails[0].addressLine1,
-            amount: salesReturnTotal(salesReturns)
-        };
-        
-        setPostValues({...postValues, ...postData });
-    }
-
-    //Calculate sales return total
-    const salesReturnTotal = (salesReturns) => {
-        let total = 0;
-        salesReturns.items.forEach(item => {
-            total += Number(item.total);
-        });
-        
-        return formatNum(total);
-    }
-
     //Posting form data to API
     const insertCreditNote = async () => {
         const creditNoteID = postValues.creditNoteID;
-        const salesReturnID = postValues.salesReturnID;
-        const customerID = postValues.customerID;
-        const invoiceID = postValues.invoiceID;
+        const vendorID = postValues.vendorID;
         const refNo = postValues.refNo;
         const creditNoteDate = postValues.creditNoteDate;
         const status = postValues.status;
         const amount = postValues.amount;
+        const otherCharges = postValues.otherCharges;
+        const discount = postValues.discount;
+        const items = postValues.items;
        
-        let apiURL = "/api/sales/credit-note";
+        let apiURL = "/api/purchase/vendor-credit";
         var response = "";
         let formValues = {
-            salesReturnID, invoiceID, customerID, creditNoteDate, refNo, status, amount
+            vendorID, creditNoteDate, refNo, status, amount, otherCharges, discount, items
         };
         let options = {
             headers: {
@@ -135,7 +121,7 @@ const CreditNote = () => {
             }
         }
         if (creditNoteID !== "") {
-            apiURL = `/api/sales/credit-note/${creditNoteID}/update`;
+            apiURL = `/api/purchase/vendor-credit/${creditNoteID}/update`;
             response = await axios.put(apiURL, formValues, options);
         } else {
             response = await axios.post(apiURL, formValues, options);
@@ -144,7 +130,7 @@ const CreditNote = () => {
             Logout();
         if (response.data.status === "Success") {
             setModalText({
-                header: "Credit Note",
+                header: "Vendor Credit Note",
                 body: "Operation completed successfully"
             });
             setPostValues(initValues);
@@ -161,7 +147,7 @@ const CreditNote = () => {
     return (
         <Form className="mx-auto col-lg-6 col-md-8 col-sm-10 p-3 formBg" onSubmit={handleSubmit}>
             <PreLoader loading={loading} />
-            <div className="text-center fs-1 mb-1 formHead">CREDIT NOTE</div>
+            <div className="text-center fs-1 mb-1 formHead">VENDOR CREDIT NOTE</div>
             <div className="d-flex flex-row align-items-baseline">
                 <Button variant="primary" onClick={() => setPostValues(initValues)}>New Credit Note</Button>
                 &emsp;
@@ -172,7 +158,7 @@ const CreditNote = () => {
             </div>
             <Row>
                 <Form.Group className="col-md-6 mb-1" controlId="formDate">
-                    <Form.Label>Received Date</Form.Label>
+                    <Form.Label>Date</Form.Label>
                     <Form.Control type="date" name="creditNoteDate" value={postValues.creditNoteDate} onChange={handleChange} />
                     <Form.Text className="text-danger">{errorValues.creditNoteDate}</Form.Text>
                 </Form.Group>
@@ -186,20 +172,15 @@ const CreditNote = () => {
                     </Form.Select>
                     <Form.Text className="text-danger">{errorValues.status}</Form.Text>
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-1" controlId="formSalesReturns">
-                    <Form.Label>Select Sales Returns</Form.Label>
-                    <PickList title={plSalesReturns.title} rowHeaders={plSalesReturns.rowHeaders} search={plSalesReturns.search}
-                        data={plSalesReturns.data} onSelect={loadSalesReturns} />
+                <Form.Group className="col-md-6 mb-1" controlId="formVendor">
+                    <Form.Label>Select Vendor</Form.Label>
+                    <PickList title={plVendor.title} rowHeaders={plVendor.rowHeaders} search={plVendor.search}
+                        data={plVendor.data} onSelect={loadVendorDetails} />
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formName">
                     <Form.Label>Full Name</Form.Label>
-                    <Form.Control type="text" name="customerName" value={postValues.customerName} onChange={handleChange} placeholder="Customer Name" disabled />
-                    <Form.Text className="text-danger">{errorValues.customerName}</Form.Text>
-                </Form.Group>
-                <Form.Group className="col-md-6 mb-1" controlId="formAddressLine1">
-                    <Form.Label>Address Line 1</Form.Label>
-                    <Form.Control type="text" name="addressLine1" value={postValues.addressLine1} onChange={handleChange} placeholder="Address Line 1" disabled />
-                    <Form.Text className="text-danger">{errorValues.addressLine1}</Form.Text>
+                    <Form.Control type="text" name="companyName" value={postValues.companyName} onChange={handleChange} placeholder="Company Name" disabled />
+                    <Form.Text className="text-danger">{errorValues.companyName}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formRefNo">
                     <Form.Label>Reference No.</Form.Label>
@@ -208,10 +189,24 @@ const CreditNote = () => {
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-1" controlId="formAmount">
                     <Form.Label>Amount</Form.Label>
-                    <Form.Control type="number" name="amount" value={postValues.amount} onChange={handleChange} placeholder="Amount"/>
+                    <Form.Control type="number" name="amount" value={postValues.amount} onChange={handleChange} />
                     <Form.Text className="text-danger">{errorValues.amount}</Form.Text>
                 </Form.Group>
+                <Form.Group className="col-md-6 mb-1" controlId="formOthers">
+                    <Form.Label>Other Charges</Form.Label>
+                    <Form.Control type="number" name="otherCharges" value={postValues.otherCharges} onChange={handleChange} placeholder="Other Charges"/>
+                    <Form.Text className="text-danger">{errorValues.otherCharges}</Form.Text>
+                </Form.Group>
+                <Form.Group className="col-md-6 mb-1" controlId="formDiscount">
+                    <Form.Label>Discount</Form.Label>
+                    <Form.Control type="number" name="discount" value={postValues.discount} onChange={handleChange} placeholder="Discount"/>
+                    <Form.Text className="text-danger">{errorValues.discount}</Form.Text>
+                </Form.Group>
             </Row>
+            <Form.Group controlId="formItems">
+                <ItemSelector token={token} mode="P" postValues={postValues} setPostValues={setPostValues} />
+                <Form.Text className="text-danger">{errorValues.items}</Form.Text>
+            </Form.Group>
             <div className="d-grid mb-4">
                 <Button variant="primary" type="submit" >Submit</Button>
             </div>
@@ -230,4 +225,4 @@ const CreditNote = () => {
     );
 };
 
-export default CreditNote;
+export default VendorCreditNote;

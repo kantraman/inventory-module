@@ -1,5 +1,10 @@
 import { getItemByGroups } from "../Items/loadItems";
-import { getAllBills, getAllPurchaseOrders, getVendors } from "../Purchase/loadDataPurchase";
+import {
+    getAllBills,
+    getAllPurchaseOrders,
+    getAllVendorCreditNotes,
+    getVendors
+} from "../Purchase/loadDataPurchase";
 import {
     getAllSalesOrders,
     getCustomers,
@@ -190,6 +195,23 @@ export const intializeBills = async (token, status="") => {
     details.search = [{
         title: "Name",
         field: "companyName"
+    }, {
+        title: "Address",
+        field: "addressLine1"
+    }]
+    return details;
+}
+
+//Vendor Credit Notes
+export const intializeVendorCreditNote = async (token, status="") => {
+    const details = {};
+    details.data = await getAllVendorCreditNotes(token, status);
+    details.title = "CREDIT NOTES";
+    details.rowHeaders = ["ID", "Status", "Date", "Ref. No.", "Vendor ID",
+        "Company Name", "Address", "Amount", "Other Charges", "Discount"];
+    details.search = [{
+        title: "Name",
+        field: "customerName"
     }, {
         title: "Address",
         field: "addressLine1"

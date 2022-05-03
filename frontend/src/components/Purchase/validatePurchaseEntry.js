@@ -100,3 +100,27 @@ export const validatePayments = (formValues) => {
     
     return errors;
 }
+
+//Vendor Credit Note
+export const validateVendorCreditNote = (formValues) => {
+    const errors = {};
+
+    if (!formValues.vendorID)
+        errors.companyName = "Vendor details is required.";
+    if (!formValues.status)
+        errors.status = "Status is required.";
+    if (!formValues.creditNoteDate)
+        errors.creditNoteDate = "Credit note date is required.";
+    if (!formValues.refNo)
+        errors.refNo = "Reference no. is required.";
+    if (formValues.items.length === 0)
+        errors.items = "Select the items.";
+    if (Number(formValues.amount) <= 0)
+        errors.amount = "Invalid amount";
+    if (isNaN(formValues.otherCharges))
+        errors.otherCharges = "Invalid other charges";
+    if (isNaN(formValues.discount))
+        errors.discount = "Invalid discount";
+    
+    return errors;
+}

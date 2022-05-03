@@ -8,6 +8,7 @@ const insertVendorCreditNote = (req, res) => {
             vendorID: req.body.vendorID,
             refNo: req.body.refNo,
             amount: req.body.amount,
+            otherCharges: req.body.otherCharges,
             discount: req.body.discount,
             items: req.body.items,
             status: "Draft"
@@ -47,6 +48,7 @@ const updateVendorCreditNote = async (req, res) => {
                 vendorID: req.body.vendorID,
                 refNo: req.body.refNo,
                 amount: req.body.amount,
+                otherCharges: req.body.otherCharges,
                 discount: req.body.discount,
                 items: req.body.items,
                 status: req.body.status

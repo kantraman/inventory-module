@@ -141,3 +141,48 @@ export const getAllBills = async (token, status="") => {
     return allBills;
 };
 
+//Vendor Credit Note
+export const getAllVendorCreditNotes = async (token, status="") => {
+    const getAllCreditNotes = [];
+    const response = await axios.get("/api/purchase/vendor-credit/A", {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = handleResponse(response);
+    items.forEach((item) => {
+        let creditNote = {
+            creditNoteID: item.creditNoteID,
+            status: item.status,
+            creditNoteDate: formatDateFromDB(item.creditNoteDate),
+            refNo: item.refNo,
+            vendorID: item.vendorID,
+            companyName: item.vendorDetails[0].companyName,
+            addressLine1: item.vendorDetails[0].addressLine1,
+            amount: formatNum(item.amount),
+            otherCharges: formatNum(item.otherCharges),
+            discount: formatNum(item.discount)
+        };
+        if (status !== "") {
+            if (status.indexOf(item.status) > -1)
+                getAllCreditNotes.push(creditNote);
+        } else {
+            getAllCreditNotes.push(creditNote);
+        }
+    })
+    
+    return getAllCreditNotes;
+};
+
+export const getVendorCreditNoteDetails = async (creditNoteID, token) => {
+    const response = await axios.get(`/api/purchase/vendor-credit/${creditNoteID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    console.log(response.data);
+    let items = handleResponse(response);
+    return items[0];
+};

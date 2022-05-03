@@ -28,6 +28,7 @@ import PurchaseOrderDatewise from "./components/Purchase/PurchaseOrderVendorDate
 import Bill from "./components/Purchase/BillsPayable";
 import BillPayment from "./components/Purchase/BillPayment";
 import BillPaymentDatewise from "./components/Purchase/BillPaymentsDatewise";
+import VendorCreditNote from "./components/Purchase/VendorCreditNote";
 
 function App() {
   const { token, setToken } = useToken();
@@ -79,6 +80,7 @@ function App() {
         <Route path="/bills" element={<Bill />} />
         <Route path="/bill-payment" element={<PaymentsRecTab tab1={<BillPayment />}
           tab2={<BillPaymentDatewise />} />} />
+        <Route path="/vendor-credit" element={<VendorCreditNote />} />
       </Routes>
     </div>
   );

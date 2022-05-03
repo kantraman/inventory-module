@@ -30,6 +30,9 @@ const VendorCreditNoteSchema = new Schema({
     discount: {
         type: Number
     },
+    otherCharges: {
+        type: Number
+    },
     status: {
         type: String,
         required: true
