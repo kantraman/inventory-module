@@ -133,7 +133,7 @@ const Vendor = () => {
         <Form className="mx-auto col-lg-6 col-md-8 col-sm-10 p-3 formBg" onSubmit={handleSubmit}>
             <div className="text-center fs-1 mb-1 formHead">VENDOR</div>
             <div className="d-flex flex-row align-items-baseline">
-                    <Button variant="primary" onClick={() => setPostValues(initValues)}>New Customer</Button>
+                    <Button variant="primary" onClick={() => setPostValues(initValues)}>New Vendor</Button>
                 &emsp;
                     <Form.Label>Select Vendor</Form.Label>
                 <PickList title={plProps.title} rowHeaders={plProps.rowHeaders} search={plProps.search}

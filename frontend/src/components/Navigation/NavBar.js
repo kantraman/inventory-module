@@ -22,6 +22,7 @@ const NavBar = ({ visible }) => {
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <Nav className="nav myNav flex-column">
+                    <Nav.Link href="/home">Dashboard</Nav.Link>
                         <NavDropdown title="Inventory" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/item-group">Item Group</NavDropdown.Item>
                             <NavDropdown.Item href="/item">Item</NavDropdown.Item>

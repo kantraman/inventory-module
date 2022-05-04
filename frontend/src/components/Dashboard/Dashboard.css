@@ -13,3 +13,14 @@
     margin: 3px 2px;
     color: white;
 }
+
+.link{
+    text-decoration: none;
+    display: block;
+    padding: 2px;
+    margin: 2px;
+}
+
+.link:hover{
+    background-color:#999999;
+}

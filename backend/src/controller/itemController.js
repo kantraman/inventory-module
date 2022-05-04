@@ -81,7 +81,10 @@ const getAllItems =  async (req, res) => {
             prefVendor: "$prefVendor",
             itemImg: "$filename"
         };
-        let item = await Items.find({groupID: ID}, projection);
+        let filter = { groupID: ID };
+        if (ID === "A")
+            filter = {};
+        let item = await Items.find(filter, projection);
         if (item.length > 0) {
             res.json(item);
         } else {
