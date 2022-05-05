@@ -182,7 +182,7 @@ const getSalesOrderForm = async (req, res) => {
         
         if (salesOrder.length > 0) {
             const template = salesOrderForm(salesOrder[0]);
-            convertToPdf(template, "SalesOrder", res);
+            convertToPdf(template, res);
         } else {
             res.json({ status: "Error", message: "No records found" });
         }

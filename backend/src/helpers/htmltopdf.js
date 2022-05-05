@@ -1,10 +1,10 @@
 const pdf = require("html-pdf");
 
-const convertToPdf = (template, filename, res) => {
+const convertToPdf = (template, res, orientation="portrait") => {
     
     const buffer = pdf.create(template, {
         "format": "A4",
-        "orientation": "portrait"
+        "orientation": orientation
     }).toBuffer((err, buffer) => {
         if (err)
             return res.json({ status: "Error", message: err.message })

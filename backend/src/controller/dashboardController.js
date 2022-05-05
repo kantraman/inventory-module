@@ -42,11 +42,16 @@ const getSummary4DashBoard = async (req, res) => {
 const getSummaryMonthly = async (req, res, Collection, field) => {
     try {
         const month = new Date().getMonth() + 1;
+        const year = new Date().getFullYear();
+        const summary = [];
         const status = await Collection
             .aggregate()
             .redact({
-                "$cond": [
-                    { "$eq": [{ "$month": field }, month] },
+                "$cond": [{
+                    "$and":[
+                        { "$eq": [{ "$year": field }, year] },
+                        { "$eq": [{ "$month": field }, month] }
+                    ]},
                     "$$KEEP",
                     "$$PRUNE"
                 ]
@@ -55,7 +60,14 @@ const getSummaryMonthly = async (req, res, Collection, field) => {
                 _id: "$status",
                 count: { $sum: 1 }
             });
-        res.json(status);
+        status.forEach((item) => {
+            let objStatus = {
+                Status: item._id,
+                Count: item.count
+            }
+            summary.push(objStatus)
+        })
+        res.json(summary);
     } catch (error) {
         if (!res.headersSent)
             res.json({ status: "Error", message: error.message });
@@ -85,6 +97,16 @@ const getPackagesSummary = async (req, res) => {
 //Get Delivery Challan Summary Monthly
 const getDeliveryChallanSummary = async (req, res) => {
     getSummaryMonthly(req, res, DeliveryChallan, "$challanDate");
+}
+
+//Get Invoice Summary Monthly
+const getInvoicesSummary = async (req, res) => {
+    getSummaryMonthly(req, res, Invoices, "$invoiceDate");
+}
+
+//Get Bill Summary Monthly
+const getBillSummary = async (req, res) => {
+    getSummaryMonthly(req, res, Bills, "$billDate");
 }
 
 //Get Customer Summary
@@ -225,12 +247,35 @@ const getItemSummary = async (req, res) => {
     }
 }
 
-//Get Item Stock
-const getItemStock = async (itemID) => {
+//Get Item Stock (Opening Stock + Total Adjustment + Total Purchase - Total Sales)
+const getItemStock = async (itemID, report=false) => {
     let itemStock = 0;
     let openingStock = await Items.findOne({ itemID: itemID });
     itemStock += Number(openingStock.openingStock);
     
+    let invAdj = await getInventoryAdjustment(itemID);
+    itemStock += invAdj;
+    
+    let itemSales = await getItemSales(itemID);
+    itemStock -= itemSales;
+      
+    let itemPurchase = await getItemPurchase(itemID);
+    itemStock += itemPurchase;
+    
+    if (report)
+        return {
+            itemStock: itemStock,
+            invAdj: invAdj,
+            itemSales: itemSales,
+            itemPurchase: itemPurchase
+        }
+    else
+        return itemStock;
+}
+
+//Get Inventory Adjustment
+const getInventoryAdjustment = async (itemID) => {
+    let invAdj = 0;
     let inventoryAdj = await InvAdjustments.aggregate()
         .match({ itemID: itemID })
         .group({
@@ -239,62 +284,15 @@ const getItemStock = async (itemID) => {
     if (inventoryAdj.length > 0) {
         inventoryAdj.forEach((item) => {
             if (item._id === "I")
-                itemStock += Number(item.quantity);
+                invAdj += Number(item.quantity);
             else
-                itemStock -= Number(item.quantity);
+                invAdj -= Number(item.quantity);
         })
     }
-    
-    let itemSales = await getItemSales(itemID);
-    itemStock -= itemSales;
-      
-    let bills = await Bills.aggregate()
-        .match({ status: { $ne: ["Draft", "Void"] } })
-        .unwind({
-            path: "$items",
-            includeArrayIndex: 'string',
-            preserveNullAndEmptyArrays: true
-        })
-        .match({ "items.itemID": itemID })
-        .group({
-            _id: "$items.itemID", quantity: { $sum: "$items.quantity" }
-        });
-    if (bills.length > 0)
-        itemStock += Number(bills[0].quantity);
-   
-    
-    let salesReturns = await SalesReturn.aggregate()
-        .match({ status: "Accepted" })
-        .unwind({
-            path: "$items",
-            includeArrayIndex: 'string',
-            preserveNullAndEmptyArrays: true
-        })
-        .match({ "items.itemID": itemID })
-        .group({
-            _id: "$items.itemID", quantity: { $sum: "$items.quantity" }
-        });
-    if (salesReturns.length > 0)
-        itemStock += Number(salesReturns[0].quantity);
-        
-    let vendorCreditNote = await VendorCreditNote.aggregate()
-        .match({ status: "Open" })
-        .unwind({
-            path: "$items",
-            includeArrayIndex: 'string',
-            preserveNullAndEmptyArrays: true
-        })
-        .match({ "items.itemID": itemID })
-        .group({
-            _id: "$items.itemID", quantity: { $sum: "$items.quantity" }
-        });
-    if (vendorCreditNote.length > 0)
-        itemStock -= Number(vendorCreditNote[0].quantity);
-        
-    return itemStock;
+    return invAdj;
 }
 
-//Get item sales 
+//Get item sales (Sales - Sales Returns)
 const getItemSales = async (itemID) => {
     let itemSales = 0;
     let invoice = await Invoices.aggregate()
@@ -310,8 +308,128 @@ const getItemSales = async (itemID) => {
         });
     if (invoice.length > 0)
         itemSales = Number(invoice[0].quantity);
+    
+    let salesReturns = await SalesReturn.aggregate()
+        .match({ status: "Accepted" })
+        .unwind({
+            path: "$items",
+            includeArrayIndex: 'string',
+            preserveNullAndEmptyArrays: true
+        })
+        .match({ "items.itemID": itemID })
+        .group({
+            _id: "$items.itemID", quantity: { $sum: "$items.quantity" }
+        });
+    if (salesReturns.length > 0)
+        itemSales -= Number(salesReturns[0].quantity);
+    
     return itemSales;
 };
+
+//Get item purchase (Purchase - Purchase Returns)
+const getItemPurchase = async (itemID) => {
+    let itemPurchase = 0;
+    let bills = await Bills.aggregate()
+        .match({ status: { $ne: ["Draft", "Void"] } })
+        .unwind({
+            path: "$items",
+            includeArrayIndex: 'string',
+            preserveNullAndEmptyArrays: true
+        })
+        .match({ "items.itemID": itemID })
+        .group({
+            _id: "$items.itemID", quantity: { $sum: "$items.quantity" }
+        });
+    if (bills.length > 0)
+        itemPurchase = Number(bills[0].quantity);
+    
+    let vendorCreditNote = await VendorCreditNote.aggregate()
+        .match({ status: "Open" })
+        .unwind({
+            path: "$items",
+            includeArrayIndex: 'string',
+            preserveNullAndEmptyArrays: true
+        })
+        .match({ "items.itemID": itemID })
+        .group({
+            _id: "$items.itemID", quantity: { $sum: "$items.quantity" }
+        });
+    if (vendorCreditNote.length > 0)
+        itemPurchase -= Number(vendorCreditNote[0].quantity);
+    
+    return itemPurchase;
+}
+
+//Get details for this month - Payments, Receipts, Inventory Adj
+const getRecPayAdjMonthly = async (req, res) => {
+    try {
+        const month = new Date().getMonth() + 1;
+        const year = new Date().getFullYear();
+        const summary = [];
+
+        //Inventory Adjustment
+        let invAdj = await InvAdjustments.find({
+            "$expr": {
+                "$and": [
+                    { "$eq": [{ "$year": "$adjDate" }, year] },
+                    { "$eq": [{ "$month": "$adjDate" }, month] }
+                ]
+            }
+        }).count();
+
+        //Payment Received
+        let recPayments = await PaymentsRec.aggregate()
+            .redact({
+                "$cond": [{
+                    "$and": [
+                        { "$eq": [{ "$year": "$paymentRecDate" }, year] },
+                        { "$eq": [{ "$month": "$paymentRecDate" }, month] }
+                    ]
+                },
+                    "$$KEEP",
+                    "$$PRUNE"
+                ]
+            })
+            .group({
+                _id: "$invoiceID",
+                amount: { "$sum": "$amount" }
+            });
+        
+        //Bill Payments
+        let billPayments = await BillPayment.aggregate()
+            .redact({
+                "$cond": [{
+                    "$and": [
+                        { "$eq": [{ "$year": "$paymentDate" }, year] },
+                        { "$eq": [{ "$month": "$paymentDate" }, month] }
+                    ]
+                },
+                    "$$KEEP",
+                    "$$PRUNE"
+                ]
+            })
+            .group({
+                _id: null,
+                amount: {
+                    "$sum": { "$add": ["$amount", "$otherCharges"] }
+                }
+            });
+       
+        const recPayInvAdjSummary = {
+            "...": "Total",
+            "Inventory Adj": invAdj,
+            "Payments Rec": recPayments.length > 0 ? recPayments[0].amount.toFixed(2) : "0.00",
+            "Bill Payments": billPayments.length > 0 ? billPayments[0].amount.toFixed(2) : "0.00",
+        };
+
+        summary.push(recPayInvAdjSummary);
+        res.json(summary);
+
+    } catch (error) {
+        if (!res.headersSent)
+            res.json({ status: "Error", message: error.message });
+    }
+}
 
 module.exports = {
     getSummary4DashBoard,
@@ -320,7 +438,11 @@ module.exports = {
     getSalesReturnSummary,
     getDeliveryChallanSummary,
     getPackagesSummary,
+    getBillSummary,
+    getInvoicesSummary,
     getCustomerSummary,
     getVendorSummary,
-    getItemSummary
+    getItemSummary,
+    getRecPayAdjMonthly,
+    getItemStock
 }

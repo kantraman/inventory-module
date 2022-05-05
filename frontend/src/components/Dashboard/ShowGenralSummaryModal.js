@@ -5,6 +5,7 @@ import PickList from '../PickList/PickList';
 import { intializeCustomer, intializeVendor, intializeItems } from '../PickList/intializeProperties';
 import { getItemGroups } from '../Items/loadItems';
 import PreLoader from '../PreLoader';
+import SummaryTable from './SummaryTable';
 
 const ShowGenralSummaryModal = ({
     title,
@@ -138,46 +139,7 @@ const ShowGenralSummaryModal = ({
                         </Form.Group>
                     </Row>
                     <Button variant="primary" onClick={showSummary}>Show Summary</Button> <br />
-                    <Table variant="dark" style={{ "whiteSpace": 'nowrap' }} hover responsive>
-                        <thead>
-                           
-                            {
-                                details.map((item, index) => {
-                                    let objValues = Object.keys(item);
-                                    if (index === 0) {
-                                        return (
-                                            <tr key={index}>
-                                                {
-                                                    objValues.map(
-                                                        (value, index) => <th key={index} className={isNaN(item[value]) ? "" : "text-end"}>{value}</th>
-                                                    )
-                                                }
-                                            </tr>
-                                        );
-                                    } else {
-                                        return null;
-                                    }
-                                })
-                            }
-                           
-                        </thead>
-                        <tbody style={{ cursor: "pointer" }}>
-                            {
-                                details.map((item, index) => {
-                                    let objValues = Object.values(item);
-                                    return (
-                                        <tr key={index}>
-                                            {
-                                                objValues.map(
-                                                    (value, index) => <td key={index} className={isNaN(value) ? "" : "text-end"}>{value}</td>
-                                                )
-                                            }
-                                        </tr>
-                                    );
-                                })
-                            }
-                        </tbody>
-                    </Table>
+                    <SummaryTable details={ details }/>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>

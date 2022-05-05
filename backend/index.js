@@ -12,6 +12,7 @@ const inventoryRouter = require("./src/routes/inventoryRouter");
 const salesRouter = require("./src/routes/salesRouter");
 const purchaseRouter = require("./src/routes/purchaseRouter");
 const dashboardRouter = require("./src/routes/dashboardRouter");
+const reportsRouter = require("./src/routes/reportsRouter");
 
 dotenv.config();
 app.use(express.urlencoded({ extended: true }));
@@ -23,6 +24,8 @@ app.use("/api/inventory", inventoryRouter);
 app.use("/api/sales", salesRouter);
 app.use("/api/purchase", purchaseRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/reports", reportsRouter);
+
 
 // app.use(express.static(path.resolve(__dirname, "./client")));
 // app.get("*", (req, res) => {

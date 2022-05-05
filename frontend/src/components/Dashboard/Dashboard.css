@@ -19,8 +19,16 @@
     display: block;
     padding: 2px;
     margin: 2px;
+    color:white;
 }
 
 .link:hover{
     background-color:#999999;
+}
+
+.summaryTile{
+    background-color: #333333;
+    padding: 5px;
+    border-radius: 10px;
+    margin: 2px;
 }

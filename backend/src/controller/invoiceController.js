@@ -120,7 +120,7 @@ const getInvoiceForm = async (req, res) => {
         
         if (invoice.length > 0) {
             const template = generateInvoice(invoice[0]);
-            convertToPdf(template, "Invoice", res);
+            convertToPdf(template, res);
         } else {
             res.json({ status: "Error", message: "No records found" });
         }

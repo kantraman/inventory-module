@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import useToken from '../Admin/useToken';
 import { getGeneralSummary } from './loadDashboardData';
 import './Dashboard.css';
 import ShowGenralSummaryModal from './ShowGenralSummaryModal';
 
-const ShowGeneralSummary = () => {
+const ShowGeneralSummary = ({token}) => {
     const [details, setDetails] = useState([]);
-    const { token } = useToken()
 
     const loadDetails = async () => {
         let genSummary = await getGeneralSummary(token);

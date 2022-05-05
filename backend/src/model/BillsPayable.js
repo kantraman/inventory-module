@@ -45,7 +45,7 @@ const BillsPayableSchema = new Schema({
 BillsPayableSchema.pre("save", async function (next) {
     try {
         if (this.isNew) {
-            let total = await Bills.find().sort({ invoiceID: -1 }).limit(1);
+            let total = await Bills.find().sort({ billID: -1 }).limit(1);
             this.billID = total.length === 0 ? 1 : Number(total[0].billID) + 1;
         }
         next()
