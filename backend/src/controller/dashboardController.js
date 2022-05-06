@@ -252,16 +252,16 @@ const getItemStock = async (itemID, report=false) => {
     let itemStock = 0;
     let openingStock = await Items.findOne({ itemID: itemID });
     itemStock += Number(openingStock.openingStock);
-    
+   
     let invAdj = await getInventoryAdjustment(itemID);
     itemStock += invAdj;
-    
+   
     let itemSales = await getItemSales(itemID);
     itemStock -= itemSales;
-      
+    
     let itemPurchase = await getItemPurchase(itemID);
     itemStock += itemPurchase;
-    
+   
     if (report)
         return {
             itemStock: itemStock,

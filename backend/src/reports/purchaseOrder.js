@@ -170,7 +170,7 @@ const purchaseOrderForm = (purchaseOrder) => {
                             <td class="text-right">${Number(item.total).toFixed(2)}</td>
                         </tr>` 
                     )
-                })
+                }).join("\n")
                 }
                
              </table>

@@ -15,6 +15,9 @@ const SalesReturn = require("../model/SalesReturn");
 const Vendors = require("../model/Vendor");
 const VendorCreditNote = require("../model/VendorCreditNote");
 const { getItemStock } = require("./dashboardController");
+const inventorySummaryTemplate = require("../reports/inventorySummary");
+const convertToPdf = require("../helpers/htmltopdf");
+const convertJsonToExcel = require("../helpers/convertToExcel");
 
 
 const getInventoryReportData = async () => {
@@ -82,7 +85,21 @@ const getOrderedQuantity = async (itemID) => {
 const getInventorySummary = async (req, res) => {
     try {
         let inventorySummary = await getInventoryReportData();
-        res.json(inventorySummary);
+        let template = inventorySummaryTemplate(inventorySummary);
+        
+        convertToPdf(template, res, "landscape");
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const getInventorySummaryExcel = async (req, res) => {
+    try {
+        let inventorySummary = await getInventoryReportData();
+       
+        convertJsonToExcel(inventorySummary,"Inventory Summary", res);
+
     } catch (error) {
         console.log(error);
     }
@@ -90,4 +107,5 @@ const getInventorySummary = async (req, res) => {
 
 module.exports = {
     getInventorySummary,
+    getInventorySummaryExcel
 }

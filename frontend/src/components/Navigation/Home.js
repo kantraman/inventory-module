@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ShowGeneralSummary from '../Dashboard/ShowGeneralSummary';
 import { Row, Col } from 'react-bootstrap';
 import useToken from '../Admin/useToken';
 import MonthlySummary from '../Dashboard/MonthlySummary';
+import Preloader from '../PreLoader';
 
 const Home = () => {
     const { token } = useToken();
+    const [loading, setLoading] = useState(true);
+
+    setTimeout(() => {
+        setLoading(false)
+    }, 3000);
+
     return (
         <div>
+            <Preloader loading={loading} />
             <h1 className="bg-secondary text-white text-center m-3"> GENERAL SUMMARY </h1>
             <ShowGeneralSummary token={token} />
             <h1 className="bg-secondary text-white text-center m-3"> MONTHLY SUMMARY </h1>

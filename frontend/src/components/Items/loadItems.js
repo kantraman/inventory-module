@@ -54,3 +54,18 @@ export const getItemDetails = async (token, itemID) => {
     
     return items[0];
 }
+
+export const getItemStock = async (token, itemID) => {
+    const response = await axios.get(`/api/inventory/item-stock/${itemID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+    let items = response.data;
+    
+    if (items.stockOnHand)
+        return "Stock : " + items.stockOnHand;
+    else
+        return "";
+}

@@ -8,7 +8,8 @@ const {
 const {
     insertItem,
     getItem,
-    getAllItems
+    getAllItems,
+    getItemStockOnHand
 } = require("../controller/itemController");
 const {
     insertInvAdj,
@@ -40,6 +41,7 @@ inventoryRouter.get("/item-groups/:id", auth, async (req, res) => getItemGroups(
 inventoryRouter.post("/item", auth, upload.single('itemImg'), (req, res) => insertItem(req, res));
 inventoryRouter.get("/item/:id", auth, async (req, res) => getItem(req, res));
 inventoryRouter.get("/allitems4group/:id", auth, async (req, res) => getAllItems(req, res));
+inventoryRouter.get("/item-stock/:id", auth, async (req, res) => getItemStockOnHand(req, res));
 
 //Inventory Adjustment
 inventoryRouter.post("/inv-adj", auth, (req, res) => insertInvAdj(req, res));

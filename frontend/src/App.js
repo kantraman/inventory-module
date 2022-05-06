@@ -29,6 +29,7 @@ import Bill from "./components/Purchase/BillsPayable";
 import BillPayment from "./components/Purchase/BillPayment";
 import BillPaymentDatewise from "./components/Purchase/BillPaymentsDatewise";
 import VendorCreditNote from "./components/Purchase/VendorCreditNote";
+import ReportViewer from "./components/Reports/ReportViewer";
 
 function App() {
   const { token, setToken } = useToken();
@@ -81,6 +82,7 @@ function App() {
         <Route path="/bill-payment" element={<PaymentsRecTab tab1={<BillPayment />}
           tab2={<BillPaymentDatewise />} />} />
         <Route path="/vendor-credit" element={<VendorCreditNote />} />
+        <Route path="/reports" element={<ReportViewer />} />
       </Routes>
     </div>
   );

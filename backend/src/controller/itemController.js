@@ -1,4 +1,5 @@
 const Items = require("../model/Items");
+const { getItemStock } = require("./dashboardController");
 
 //Insert Item Group
 const insertItem = (req, res) => {
@@ -97,10 +98,25 @@ const getAllItems =  async (req, res) => {
     }
 }
 
+//Get item stock
+const getItemStockOnHand =  async (req, res) => {
+    try {
+        let ID = Number(req.params.id);
+        let stock = await getItemStock(ID);
+
+        res.json({ stockOnHand: stock });
+        
+    } catch (error) {
+        if (!res.headersSent)
+            res.json({ status: "Error", message: error.message });
+    }
+}
+
 
 
 module.exports = {
     insertItem,
     getItem,
-    getAllItems
+    getAllItems,
+    getItemStockOnHand
 };

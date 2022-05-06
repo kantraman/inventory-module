@@ -1,6 +1,6 @@
 import React, {useState, useEffect, } from 'react';
 import { Form, Row, Button, Table } from 'react-bootstrap';
-import { getItemDetails, getItemGroups } from './loadItems';
+import { getItemDetails, getItemGroups, getItemStock } from './loadItems';
 import { intializeItems } from '../PickList/intializeProperties';
 import PickList from '../PickList/PickList';
 
@@ -25,6 +25,7 @@ const ItemSelector = ({
         descr: "",
         openingStock: "0",
         reorderPoint: "0",
+        itemStock: "",
         prefVendor: "",
         itemImg: "",
         filepreview: null,
@@ -50,6 +51,7 @@ const ItemSelector = ({
         itemDetails.filepreview = "/uploads/" + itemDetails.itemImg;
         itemDetails.quantity = 0;
         itemDetails.tax = itemGroups[itemDetails.groupID - 1]["tax"];
+        itemDetails.itemStock = await getItemStock(token, item[0]);
         setItemDetails(itemDetails)
     }
 
@@ -79,7 +81,7 @@ const ItemSelector = ({
     };
     
     //Calculate Total
-    function calculateTotal(){
+    function calculateTotal() {
         let total = 0;
         if (postValues.items)
             postValues.items.forEach((item) => {
@@ -95,11 +97,11 @@ const ItemSelector = ({
             itemID: itemDetails.itemID,
             itemName: itemDetails.itemName,
             price: Number(itemDetails[price]).toFixed(2),
-            tax: ((itemDetails[price] * itemDetails.tax)/100).toFixed(2),
+            tax: ((itemDetails[price] * itemDetails.tax) / 100).toFixed(2),
             quantity: itemDetails.quantity,
             total: (
                 (itemDetails[price] + (
-                    (itemDetails[price] * itemDetails.tax)/100))
+                    (itemDetails[price] * itemDetails.tax) / 100))
                 * itemDetails.quantity
             ).toFixed(2)
         }
@@ -138,46 +140,50 @@ const ItemSelector = ({
     return (
         <>
             <Row >
-                <Form.Group className="col-md-6  mb-2" controlId="formItemGroup">
+                <Form.Group className="col-md-6  mb-1" controlId="formItemGroup">
                     <Form.Label>Item Group</Form.Label>
                     <Form.Select name="groupID" value={itemDetails.groupID} onChange={handleItemGrpChange} >
                         <option value="">--Select--</option>
                         {itemGroups.map(item => <option value={item.ID} key={item.ID}>{item["Group Name"]}</option>)}
                     </Form.Select>
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-2" controlId="formItem">
+                <Form.Group className="col-md-6 mb-1" controlId="formItem">
                     <Form.Label>Select Item</Form.Label>
                     <PickList title={plItems.title} rowHeaders={plItems.rowHeaders} search={plItems.search}
                         data={plItems.data} onSelect={loadItemDetails} />
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-2" controlId="formItemID">
+                <Form.Group className="col-md-6 mb-1" controlId="formItemID">
                     <Form.Label>Item ID</Form.Label>
                     <Form.Control type="text" name="itemID" value={itemDetails.itemID} placeholder="Item ID" disabled />
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-2" controlId="formItemName">
+                <Form.Group className="col-md-6 mb-1" controlId="formItemName">
                     <Form.Label>Item Name</Form.Label>
                     <Form.Control type="text" name="itemName" value={itemDetails.itemName} placeholder="Item Name" disabled />
                 </Form.Group>
-                {mode === "S" ? <Form.Group className="col-md-6 mb-2" controlId="formSP">
+               
+                {mode === "S" ? <Form.Group className="col-md-6 mb-1" controlId="formSP">
                     <Form.Label>Selling Price</Form.Label>
                     <Form.Control type="number" name="sellingPrice" value={itemDetails.sellingPrice} placeholder="Selling Price" disabled />
                 </Form.Group>
-                    : <Form.Group className="col-md-6 mb-2" controlId="formCP">
+                    : <Form.Group className="col-md-6 mb-1" controlId="formCP">
                         <Form.Label>Cost Price</Form.Label>
                         <Form.Control type="number" name="costPrice" value={itemDetails.costPrice} placeholder="Cost Price" disabled />
                     </Form.Group>
                 }
-                <Form.Group className="col-md-6 mb-2" controlId="formTax">
+                <Form.Group className="col-md-6 mb-1" controlId="formItemStock">
+                    <Form.Text className="fs-1 text-white">{itemDetails.itemStock}</Form.Text>
+                </Form.Group>
+                <Form.Group className="col-md-6 mb-1" controlId="formTax">
                     <Form.Label>Tax %</Form.Label>
                     <Form.Control type="number" name="tax" value={itemDetails.tax} placeholder="Tax %" disabled />
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-2" controlId="formItemImg">
-                    <Form.Label>Item Image</Form.Label>
+                <Form.Group className="col-md-6 mb-1" controlId="formItemImg">
+                    <Form.Label>Item Image</Form.Label><br/>
                     {itemDetails.filepreview !== null ?
-                        <img className="img-fluid" src={itemDetails.filepreview} alt="Item" />
+                        <img className="img-fluid" height={100} width={100} src={itemDetails.filepreview} alt="Item" />
                         : null}
                 </Form.Group>
-                <Form.Group className="col-md-6 mb-2" controlId="formQuantity">
+                <Form.Group className="col-md-6 mb-1" controlId="formQuantity">
                     <Form.Label>Quantity</Form.Label>
                     <Form.Control type="number" name="quantity" value={itemDetails.quantity} placeholder="Quantity" onChange={handleChange} />
                 </Form.Group>
