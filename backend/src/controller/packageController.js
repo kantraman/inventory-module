@@ -31,17 +31,27 @@ const insertPackage = (req, res) => {
 };
 
 //Update Package
-const updatePackage = (req, res) => {
+const updatePackage = async (req, res) => {
     try {
         const packageID = req.params.id;
+        let status = await Package.findOne({ packageID: packageID });
+        
         var updateItem = {
-            packageDate: req.body.packageDate,
-            items: req.body.items,
-            status: req.body.status,
-            customerID: req.body.customerID,
-            salesOrderID: req.body.salesOrderID
+            status: req.body.status
         };
-        if (updateItem.customerID !== "" && updateItem.customerID !== undefined && packageID !== "") {
+        if (status.status === "Not Shipped") {
+            var updateItem = {
+                packageDate: req.body.packageDate,
+                items: req.body.items,
+                status: req.body.status,
+                customerID: req.body.customerID,
+                salesOrderID: req.body.salesOrderID
+            };
+        } else {
+            if (req.body.status === "Not Shipped")
+                return res.json({ status: "Error", message: "Cannot be updated to not shipped." });
+        }
+        if (packageID !== undefined && packageID !== "") {
             Package.findOneAndUpdate({ packageID: packageID }, updateItem, null)
                 .then(res.json({ status: "Success" }))
                 .catch((er) => {

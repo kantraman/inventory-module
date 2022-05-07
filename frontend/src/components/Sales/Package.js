@@ -69,7 +69,7 @@ const Package = () => {
         event.preventDefault();
         let validationErrors = validatePackage(postValues);
         setErrorValues(validationErrors);
-        if (Object.keys(validationErrors).length === 0 && postValues.packageID !== "ND")
+        if (Object.keys(validationErrors).length === 0)
             insertPackage();
     }
 
@@ -95,8 +95,7 @@ const Package = () => {
         };
         
         if (postData.status !== "Not Shipped") {
-            window.alert("Already shipped package cannot be edited.");
-            postData.packageID = "ND";
+            window.alert("Only status can be edited.");
         }
         setPostValues(postData);
             

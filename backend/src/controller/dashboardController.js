@@ -296,7 +296,7 @@ const getInventoryAdjustment = async (itemID) => {
 const getItemSales = async (itemID) => {
     let itemSales = 0;
     let invoice = await Invoices.aggregate()
-        .match({ status: { $ne: ["Draft", "Void"] } })
+        .match({ status: {$nin: ["Draft", "Void"] } })
         .unwind({
             path: "$items",
             includeArrayIndex: 'string',
@@ -330,7 +330,7 @@ const getItemSales = async (itemID) => {
 const getItemPurchase = async (itemID) => {
     let itemPurchase = 0;
     let bills = await Bills.aggregate()
-        .match({ status: { $ne: ["Draft", "Void"] } })
+        .match({ status: { $nin: ["Draft", "Void"] } })
         .unwind({
             path: "$items",
             includeArrayIndex: 'string',
@@ -391,7 +391,7 @@ const getRecPayAdjMonthly = async (req, res) => {
                 ]
             })
             .group({
-                _id: "$invoiceID",
+                _id: null,
                 amount: { "$sum": "$amount" }
             });
         

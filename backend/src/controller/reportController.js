@@ -16,10 +16,12 @@ const Vendors = require("../model/Vendor");
 const VendorCreditNote = require("../model/VendorCreditNote");
 const { getItemStock } = require("./dashboardController");
 const inventorySummaryTemplate = require("../reports/inventorySummary");
+const productSalesTemplate = require("../reports/productSalesReport");
+const customerSalesTemplate = require("../reports/customerSalesReport");
 const convertToPdf = require("../helpers/htmltopdf");
 const convertJsonToExcel = require("../helpers/convertToExcel");
 
-
+//Get data for inventory summary
 const getInventoryReportData = async () => {
     const inventorySummary = [];
     let items = await Items.find({})
@@ -82,6 +84,7 @@ const getOrderedQuantity = async (itemID) => {
     return quantity;
 }
 
+//Get inventory summary in pdf format
 const getInventorySummary = async (req, res) => {
     try {
         let inventorySummary = await getInventoryReportData();
@@ -94,6 +97,7 @@ const getInventorySummary = async (req, res) => {
     }
 }
 
+//Get inventory summary in excel format
 const getInventorySummaryExcel = async (req, res) => {
     try {
         let inventorySummary = await getInventoryReportData();
@@ -105,7 +109,183 @@ const getInventorySummaryExcel = async (req, res) => {
     }
 }
 
+//Get data for product sales report
+const getData4ProductSalesReport = async (fromDate, toDate) => {
+    const productSales = [];
+    
+    let items = await Items.find({})
+
+    for (let item in items) {
+        let sales = await getProductSales(fromDate, toDate, items[item].itemID);
+        let quantity = 0;
+        let amount = 0;
+        if (sales.length > 0) {
+            quantity = sales[0].quantity;
+            amount = sales[0].amount;
+        }
+        let product = {
+            itemID: items[item].itemID,
+            itemName: items[item].itemName,
+            quantity: quantity,
+            amount: amount.toFixed(2)
+        }
+        productSales.push(product);
+    }
+    
+    return productSales;
+}
+
+//Get product sales by items from invoice
+const getProductSales = async (fromDate, toDate, itemID) => {
+    let sales = await Invoices.aggregate()
+        .match({
+            invoiceDate: {
+                $gte: fromDate,
+                $lt: toDate
+            },
+            status: { $nin: ["Draft", "Void"] }
+        })
+        .unwind({
+            path: "$items",
+            includeArrayIndex: 'string',
+            preserveNullAndEmptyArrays: true
+        })
+        .match({
+            "items.itemID": itemID
+        })
+        .group({
+            _id: "$items.itemID",
+            quantity: { $sum: "$items.quantity" },
+            amount: { $sum: "$items.total" }
+        });
+    return sales;
+}
+
+//Get Product Sales Report in pdf
+const getProductSalesReport = async (req, res) => {
+    try {
+        let fromDate = new Date(req.query.fromDate);
+        let toDate = new Date(req.query.toDate);
+        toDate.setDate(toDate.getDate() + 1);
+
+        let productSales = await getData4ProductSalesReport(fromDate, toDate);
+
+        let template = productSalesTemplate(productSales, fromDate, toDate);
+        
+        convertToPdf(template, res);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//Get Product Sales Report in xlsx
+const getProductSalesReportExcel = async (req, res) => {
+    try {
+        let fromDate = new Date(req.query.fromDate);
+        let toDate = new Date(req.query.toDate);
+        toDate.setDate(toDate.getDate() + 1);
+
+        let productSales = await getData4ProductSalesReport(fromDate, toDate);
+       
+        convertJsonToExcel(productSales,"Product Sales Report", res);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//Get Customer Sales data 
+const getCustomerSalesData = async (fromDate, toDate) => {
+    const customerSales = [];
+    let customers = await Customers.find({})
+
+    for (let cust in customers) {
+        let sales = await getCustomerSales(fromDate, toDate, customers[cust].customerID);
+        let quantity = 0;
+        let amount = 0;
+        if (sales.length > 0) {
+            quantity = sales[0].quantity;
+            amount = sales[0].amount;
+        }
+        let customer = {
+            customerID: customers[cust].customerID,
+            customerName: customers[cust].customerName,
+            quantity: quantity,
+            amount: amount.toFixed(2)
+        }
+        customerSales.push(customer);
+    }
+    
+    return customerSales;
+
+};
+
+//Get sales by customers from invoice
+const getCustomerSales = async (fromDate, toDate, customerID) => {
+    let sales = await Invoices.aggregate()
+        .match({
+            invoiceDate: {
+                $gte: fromDate,
+                $lt: toDate
+            },
+            status: { $nin: ["Draft", "Void"] },
+            customerID: customerID
+        })
+        .unwind({
+            path: "$items",
+            includeArrayIndex: 'string',
+            preserveNullAndEmptyArrays: true
+        })
+        .group({
+            _id: "$customerID",
+            quantity: { $sum: "$items.quantity" },
+            amount: { $sum: "$items.total" }
+        });
+    
+    return sales;
+};
+
+//Get Customer Sales Report in pdf
+const getCustomerSalesReport = async (req, res) => {
+    try {
+        let fromDate = new Date(req.query.fromDate);
+        let toDate = new Date(req.query.toDate);
+        toDate.setDate(toDate.getDate() + 1);
+
+        let customerSales = await getCustomerSalesData(fromDate, toDate);
+
+        let template = customerSalesTemplate(customerSales, fromDate, toDate);
+        
+        convertToPdf(template, res);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//Get Product Sales Report in xlsx
+const getCustomerSalesReportExcel = async (req, res) => {
+    try {
+        let fromDate = new Date(req.query.fromDate);
+        let toDate = new Date(req.query.toDate);
+        toDate.setDate(toDate.getDate() + 1);
+
+        let customerSales = await getCustomerSalesData(fromDate, toDate);
+       
+        convertJsonToExcel(customerSales,"Customer Sales Report", res);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 module.exports = {
     getInventorySummary,
-    getInventorySummaryExcel
+    getInventorySummaryExcel,
+    getProductSalesReport,
+    getProductSalesReportExcel,
+    getCustomerSalesReport,
+    getCustomerSalesReportExcel
 }

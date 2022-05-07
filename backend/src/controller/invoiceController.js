@@ -45,9 +45,12 @@ const insertInvoice = (req, res) => {
 };
 
 //Update Invoice Status
-const updateInvoiceStatus = (req, res) => {
+const updateInvoiceStatus = async (req, res) => {
     try {
         const invoiceID = req.params.id;
+        let status = await Invoices.findOne({ invoiceID: invoiceID });
+        if (status.status !== "Draft" && req.body.status === "Draft")
+            return res.json({ status: "Error", message: "Status cannot be updated to draft." });
         var updateItem = {
                 status: req.body.status,
         };

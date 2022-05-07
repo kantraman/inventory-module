@@ -1,14 +1,6 @@
 import axios from "axios";
 
-export const showInventorySummary = async (token, setLoading, export2Excel = false) => {
-    let apiURL = "/api/reports/inventory-summary";
-    let contenType = "application/pdf";
-
-    if (export2Excel) {
-        apiURL = "/api/reports/export-inventory-summary";
-        contenType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    }
-
+const getReport = async (apiURL, token, contenType, setLoading) => {
     const response = await axios.get(apiURL, {
         headers: {
             'Content-Type': 'application/json',
@@ -29,4 +21,55 @@ export const showInventorySummary = async (token, setLoading, export2Excel = fal
         window.alert("An error occured while getting data.");
     }
     setLoading(false);
+}
+
+export const showInventorySummary = async (token, setLoading, export2Excel = false) => {
+    let apiURL = "/api/reports/inventory-summary";
+    let contenType = "application/pdf";
+
+    if (export2Excel) {
+        apiURL = "/api/reports/export-inventory-summary";
+        contenType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    }
+
+    getReport(apiURL, token, contenType, setLoading);
+};
+
+export const showProductSalesReport = async (
+    token,
+    fromDate,
+    toDate,
+    setLoading,
+    export2Excel = false
+) => {
+    let apiURL = "/api/reports/product-sales";
+    let contenType = "application/pdf";
+
+    if (export2Excel) {
+        apiURL = "/api/reports/export-product-sales";
+        contenType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    }
+    apiURL += `?fromDate=${fromDate}&toDate=${toDate}`
+
+    getReport(apiURL, token, contenType, setLoading);
+};
+
+export const showCustomerSalesReport = async (
+    token,
+    fromDate,
+    toDate,
+    setLoading,
+    export2Excel = false
+) => {
+    let apiURL = "/api/reports/customer-sales";
+    let contenType = "application/pdf";
+
+    if (export2Excel) {
+        apiURL = "/api/reports/export-customer-sales";
+        contenType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    }
+    apiURL += `?fromDate=${fromDate}&toDate=${toDate}`
+
+    getReport(apiURL, token, contenType, setLoading);
+   
 };

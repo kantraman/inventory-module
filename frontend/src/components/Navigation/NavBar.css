@@ -4,6 +4,10 @@
     font-size: large;
 }
 
+.myNav .nav-link:hover {
+    background-color: #777777;
+} 
+
 .myNav .dropdown-item{
     color: #fff;
     border: 1px solid #fff;
