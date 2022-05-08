@@ -23,6 +23,7 @@ const getReport = async (apiURL, token, contenType, setLoading) => {
     setLoading(false);
 }
 
+//Inventory Summary
 export const showInventorySummary = async (token, setLoading, export2Excel = false) => {
     let apiURL = "/api/reports/inventory-summary";
     let contenType = "application/pdf";
@@ -35,6 +36,7 @@ export const showInventorySummary = async (token, setLoading, export2Excel = fal
     getReport(apiURL, token, contenType, setLoading);
 };
 
+//Product Sales Report
 export const showProductSalesReport = async (
     token,
     fromDate,
@@ -54,6 +56,7 @@ export const showProductSalesReport = async (
     getReport(apiURL, token, contenType, setLoading);
 };
 
+//Sales by Customer Report
 export const showCustomerSalesReport = async (
     token,
     fromDate,
@@ -72,4 +75,17 @@ export const showCustomerSalesReport = async (
 
     getReport(apiURL, token, contenType, setLoading);
    
+};
+
+//Inventory Aging Summary
+export const showInventoryAgingSummary = async (token, setLoading, export2Excel = false) => {
+    let apiURL = "/api/reports/inventory-aging";
+    let contenType = "application/pdf";
+
+    if (export2Excel) {
+        apiURL = "/api/reports/export-inventory-aging";
+        contenType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    }
+
+    getReport(apiURL, token, contenType, setLoading);
 };

@@ -7,7 +7,9 @@ const {
     getProductSalesReport,
     getProductSalesReportExcel,
     getCustomerSalesReport,
-    getCustomerSalesReportExcel
+    getCustomerSalesReportExcel,
+    getInventoryAgingSummary,
+    getInventoryAgingSummaryExcel
 } = require("../controller/reportController");
 
 const reportsRouter = express.Router();
@@ -21,8 +23,12 @@ reportsRouter.get("/product-sales", auth, (req, res) => getProductSalesReport(re
 reportsRouter.get("/export-product-sales", auth, (req, res) => getProductSalesReportExcel(req, res));
 
 //Customer sales report
-reportsRouter.get("/customer-sales", (req, res) => getCustomerSalesReport(req, res));
+reportsRouter.get("/customer-sales", auth, (req, res) => getCustomerSalesReport(req, res));
 reportsRouter.get("/export-customer-sales", auth, (req, res) => getCustomerSalesReportExcel(req, res));
+
+//Inventory Aging Summary
+reportsRouter.get("/inventory-aging", auth, (req, res) => getInventoryAgingSummary(req, res));
+reportsRouter.get("/export-inventory-aging", auth, (req, res) => getInventoryAgingSummaryExcel(req, res));
 
 
 module.exports = reportsRouter;

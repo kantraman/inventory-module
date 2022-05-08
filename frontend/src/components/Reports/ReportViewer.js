@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useToken from '../Admin/useToken';
 import { Form, Row, Button } from 'react-bootstrap';
-import { showInventorySummary, showProductSalesReport, showCustomerSalesReport } from './loadReports';
+import { showInventorySummary, showProductSalesReport, showCustomerSalesReport, showInventoryAgingSummary } from './loadReports';
 import Preloader from '../PreLoader';
 import { formatDate } from '../../utility';
 
@@ -64,7 +64,11 @@ const ReportViewer = () => {
             case "I":
                 showInventorySummary(token, setLoading);
                 break;
+            case "A":
+                showInventoryAgingSummary(token, setLoading);
+                break;
             case "S":
+            case "SI":
                 if (Object.keys(validationErrors).length === 0)
                     showProductSalesReport(token, fromDate, toDate, setLoading);
                 break;
@@ -89,7 +93,11 @@ const ReportViewer = () => {
             case "I":
                 showInventorySummary(token, setLoading, true);
                 break;
+            case "A":
+                showInventoryAgingSummary(token, setLoading, true);
+                break;
             case "S":
+            case "SI":
                 if (Object.keys(validationErrors).length === 0)
                     showProductSalesReport(token, fromDate, toDate, setLoading, true);
                 break;
@@ -97,6 +105,7 @@ const ReportViewer = () => {
                 if (Object.keys(validationErrors).length === 0)
                     showCustomerSalesReport(token, fromDate, toDate, setLoading, true);
                 break;
+           
             default:
                 break;
         }
@@ -105,6 +114,7 @@ const ReportViewer = () => {
     return (
         <Form className="mx-auto col-lg-6 col-md-8 col-sm-10 p-3 formBg">
             <Preloader loading={loading} />
+            <div className="text-center fs-1 mb-1 formHead">REPORTS</div>
             <Row>
                 <Form.Group className="col-md-6 mb-1" controlId="formStatus">
                     <Form.Label>Report Type</Form.Label>

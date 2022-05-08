@@ -18,6 +18,7 @@ const { getItemStock } = require("./dashboardController");
 const inventorySummaryTemplate = require("../reports/inventorySummary");
 const productSalesTemplate = require("../reports/productSalesReport");
 const customerSalesTemplate = require("../reports/customerSalesReport");
+const inventoryAgingTemplate = require("../reports/inventoryAging");
 const convertToPdf = require("../helpers/htmltopdf");
 const convertJsonToExcel = require("../helpers/convertToExcel");
 
@@ -280,6 +281,138 @@ const getCustomerSalesReportExcel = async (req, res) => {
     }
 }
 
+//Get data for inventory aging report
+const getData4InventoryAging = async () => {
+    let itemAging = [];
+    let items = await Items.find({});
+    
+    for (let item in items) {
+        let itemID = items[item].itemID;
+        let itemName = items[item].itemName;
+        
+        let dayWiseSplit = await getItemStockDaywise(itemID);
+        let itemAge = {
+            itemID: itemID,
+            itemName: itemName,
+            stock: dayWiseSplit.stock,
+            age_5: dayWiseSplit.day_5,
+            age_15: dayWiseSplit.day_15,
+            age_30: dayWiseSplit.day_30,
+            age_60: dayWiseSplit.day_60,
+            age_90: dayWiseSplit.day_90,
+            ageGt90: dayWiseSplit.day_gt
+        }
+        itemAging.push(itemAge);
+    }
+
+    return itemAging;
+}
+
+//Get item stock daywise
+const getItemStockDaywise = async (itemID) => {
+    let stock = await getItemStock(itemID, false);
+    let presentStock = stock;
+    let today = Date.now();
+    const stockDaywise = [];
+    
+    // To get Stock in counting backwards from today
+    let bills = await Bills.aggregate()
+        .match({ status: { $nin: ["Draft", "Void"] } })
+        .unwind({
+            path: "$items",
+            includeArrayIndex: 'string',
+            preserveNullAndEmptyArrays: true
+        })
+        .match({ "items.itemID": itemID })
+        .group({
+            _id: "$billDate",
+            quantity: { $sum: "$items.quantity" }
+        })
+        .sort({ _id: -1 });
+    for (let bill in bills) {
+        let billDate = new Date(bills[bill]._id).getTime();
+        let quantity = bills[bill].quantity;
+        let days = (today - billDate) / (60 * 60 * 24 * 1000)
+        presentStock -= quantity;
+        if (Number(presentStock) > 0) {
+            let daywise = {
+                days: days,
+                quantity: quantity
+            }
+            stockDaywise.push(daywise);
+        }
+    }
+
+    //To group as intervals - 0-5, 6-15, 16-30, 31-60, 61-90, >90
+    let int0_5 = 0;
+    let int6_15 = 0;
+    let int15_30 = 0;
+    let int31_60 = 0;
+    let int61_90 = 0;
+    let intGt90 = 0;
+    for (let day in stockDaywise) {
+        let days = stockDaywise[day].days;
+        
+        switch (true) {
+            case days <= 5:
+                int0_5 += stockDaywise[day].quantity;
+                break;
+            case days > 5 && days <= 15:
+                int6_15 += stockDaywise[day].quantity;
+                break;
+            case days > 15 && days <= 30:
+                int15_30 += stockDaywise[day].quantity;
+                break;
+            case days > 30 && days <= 60:
+                int31_60 += stockDaywise[day].quantity;
+                break;
+            case days > 60 && days <= 90:
+                int61_90 += stockDaywise[day].quantity;
+                break;
+            default:
+                intGt90 += stockDaywise[day].quantity;
+                break;
+        }
+    }
+    intGt90 += presentStock;
+   
+    return {
+        stock: stock,
+        day_5: int0_5,
+        day_15: int6_15,
+        day_30: int15_30,
+        day_60: int31_60,
+        day_90: int61_90,
+        day_gt: intGt90
+    }
+}
+
+//Get inventory aging in pdf format
+const getInventoryAgingSummary = async (req, res) => {
+    try {
+        let inventoryAgingSummary = await getData4InventoryAging();
+        let template = inventoryAgingTemplate(inventoryAgingSummary);
+        
+        convertToPdf(template, res, "landscape");
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//Get inventory summary in excel format
+const getInventoryAgingSummaryExcel = async (req, res) => {
+    try {
+        let inventoryAgingSummary = await getData4InventoryAging();
+       
+        convertJsonToExcel(inventoryAgingSummary,"Inventory Ageing Summary", res);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
 
 module.exports = {
     getInventorySummary,
@@ -287,5 +420,7 @@ module.exports = {
     getProductSalesReport,
     getProductSalesReportExcel,
     getCustomerSalesReport,
-    getCustomerSalesReportExcel
+    getCustomerSalesReportExcel,
+    getInventoryAgingSummary,
+    getInventoryAgingSummaryExcel
 }
