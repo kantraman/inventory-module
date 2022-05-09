@@ -81,7 +81,8 @@ const PickList = ({
                         </Form.Group>
                         <Form.Group className="col-md-6 mb-2" controlId="formSearch1">
                             <Form.Label className="text-white">{search[1].title}</Form.Label>
-                            <Form.Control type="text" name="search2" value={searchValues.search2} onChange={handleChange} />
+                            <Form.Control type="text" name="search2" value={searchValues.search2} onChange={handleChange}
+                                style={search[1].title === "" ? { "display": "none" } : { "display": "block" }} />
                         </Form.Group>
                     </Row>
                     <Button variant="primary" onClick={showResult}>Search</Button> <br />

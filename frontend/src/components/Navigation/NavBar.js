@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Offcanvas, Button, Nav, NavDropdown } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import "./NavBar.css";
 
 const NavBar = ({ visible }) => {
@@ -15,6 +16,8 @@ const NavBar = ({ visible }) => {
                 <Button variant="primary" onClick={handleShow} className='d-flex align-items-center ml-4'>
                     &#9776;&emsp;Navigation
                 </Button>
+                <Link to="/signup" className="text-white"
+                    style={{ display: 'block', zIndex: 20, position: "absolute", top:"10px", right:"10px" }} >Create New User</Link>
             </div>
             <Offcanvas show={show} onHide={handleClose} className="bg-dark text-light">
                 <Offcanvas.Header closeButton>

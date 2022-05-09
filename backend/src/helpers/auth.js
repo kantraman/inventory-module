@@ -9,7 +9,8 @@ const auth = (req, res, next) => {
             const verified = jwt.verify(token, process.env.JWT_Key);
             if (!verified)
                 return res.status(401).json({ msg: "Token verification failed, authorization denied" });
-            req.user = verified.uname;
+            req.user = verified.user;
+            req.admin = verified.admin;
         } catch (err) {
             return res.status(401).json({ msg: "Token verification failed, authorization denied" });
         }

@@ -41,6 +41,36 @@ const insertItem = (req, res) => {
             res.json({ status: "Error", message: error.message });
     }
 };
+
+//Update item costs, reorder levels, pref vendor, description
+const updateItem = (req, res) => {
+    try {
+        const itemID = req.params.id;
+       
+        var updateItem = {
+            sellingPrice: req.body.sellingPrice,
+            costPrice: req.body.costPrice,
+            reorderPoint: req.body.reorderPoint,
+            prefVendor: req.body.prefVendor,
+            descr: req.body.descr
+        };
+       
+        if (itemID !== undefined && itemID !== "") {
+            Items.findOneAndUpdate({ itemID: itemID }, updateItem, null)
+                .then(res.json({status: "Success"}))
+                .catch((er) => {
+                    if (!res.headersSent)
+                        res.sendStatus(500).json({ status: "Error" });
+                });
+        } else {
+            res.json({ status: "Error", message: "Invalid inputs" });
+        }
+    } catch (error) {
+        if (!res.headersSent)
+            res.json({ status: "Error", message: error.message });
+    }
+}
+
 //Get details of a specific item
 const getItem =  async (req, res) => {
     try {
@@ -116,6 +146,7 @@ const getItemStockOnHand =  async (req, res) => {
 
 module.exports = {
     insertItem,
+    updateItem,
     getItem,
     getAllItems,
     getItemStockOnHand

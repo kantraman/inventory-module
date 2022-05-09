@@ -30,6 +30,7 @@ import BillPayment from "./components/Purchase/BillPayment";
 import BillPaymentDatewise from "./components/Purchase/BillPaymentsDatewise";
 import VendorCreditNote from "./components/Purchase/VendorCreditNote";
 import ReportViewer from "./components/Reports/ReportViewer";
+import CreateUser from "./components/Admin/CreateUser";
 
 function App() {
   const { token, setToken } = useToken();
@@ -49,7 +50,7 @@ function App() {
     return (
       <div>
         <Routes>
-          <Route path="/" element={<Login setToken={setToken} />} />
+          <Route path="*" element={<Login setToken={setToken} />} />
         </Routes>
       </div>
     );
@@ -83,6 +84,7 @@ function App() {
           tab2={<BillPaymentDatewise />} />} />
         <Route path="/vendor-credit" element={<VendorCreditNote />} />
         <Route path="/reports" element={<ReportViewer />} />
+        <Route path="/signup" element={<CreateUser />} />
       </Routes>
     </div>
   );

@@ -60,6 +60,7 @@ const getSummaryMonthly = async (req, res, Collection, field) => {
                 _id: "$status",
                 count: { $sum: 1 }
             });
+       
         status.forEach((item) => {
             let objStatus = {
                 Status: item._id,

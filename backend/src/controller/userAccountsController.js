@@ -2,9 +2,10 @@ const AccountsInfo = require("../model/UserAccounts");
 const jwt = require("jsonwebtoken");
 
 //Signup admin if required
-const signupAdmin = async (req, res) => {
+const signupUser = async (req, res) => {
     try {
-        
+        if (!req.admin)
+            return res.json({ status: "Unauthorized", message: "Only admins can create users" });
         var item = {
             uname: req.body.username,
             email: req.body.email,
@@ -51,7 +52,15 @@ const adminLogin = async (req, res) => {
     }
 }
 
+const isAdmin = (req, res) => {
+    if (!req.admin)
+        return res.json({ status: "Unauthorized", message: "Only admins can create users" });
+    else
+        return res.json({ status: "Authorized", message: "User is an admin." });
+}
+
 module.exports = {
-    signupAdmin,
-    adminLogin
+    signupUser,
+    adminLogin,
+    isAdmin
 }

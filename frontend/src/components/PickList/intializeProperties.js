@@ -1,4 +1,4 @@
-import { getItemByGroups } from "../Items/loadItems";
+import { getItemByGroups, getItemGroups } from "../Items/loadItems";
 import {
     getAllBills,
     getAllPurchaseOrders,
@@ -47,6 +47,22 @@ export const intializeItems = async (groupID, token) => {
     }, {
         title: "Brand",
         field: "brand"
+    }]
+    return details;
+}
+
+//Inventory item groups
+export const intializeItemGroups = async (token) => {
+    const details = {};
+    details.data = await getItemGroups(token);
+    details.title = "ITEM GROUPS";
+    details.rowHeaders = [ "Name", "ID", "Tax"];
+    details.search = [{
+        title: "Name",
+        field: "groupName"
+    }, {
+        title: "",
+        field: ""
     }]
     return details;
 }

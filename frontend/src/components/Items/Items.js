@@ -4,11 +4,14 @@ import useToken from '../Admin/useToken';
 import { Form, Row, Button, Modal } from 'react-bootstrap';
 import { validateItemEntry } from './validateItemEntry';
 import PreLoader from '../PreLoader';
-import { getItemGroups } from './loadItems';
+import { getItemGroups, getItemDetails } from './loadItems';
 import Logout from '../Admin/logout';
+import PickList from '../PickList/PickList';
+import { intializeItems } from '../PickList/intializeProperties';
 
 const Items = () => {
     const initValues = {
+        itemID: "",
         groupID: "",
         groupName: "",
         itemName: "",
@@ -40,20 +43,32 @@ const Items = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    //For picklist
+    const [plItems, setPlItems] = useState({});
+
     //To show preloader
     const [loading, setLoading] = useState(true);
 
     //Load item groups
     const fetchItemGroups = async () => {
         const itemGroups = await getItemGroups(token);
-         setItemGroups(itemGroups);
-         setLoading(false);
+        setItemGroups(itemGroups);
+        let itemList = await intializeItems("A", token);
+        setPlItems(itemList);
+        setLoading(false);
     }
     
     useEffect(() => {
         fetchItemGroups();
     }, []);
 
+    //Load item details
+    const loadItemDetails = async (item) => {
+        const itemDetails = await getItemDetails(token, item[0]);
+        itemDetails.filepreview = "/uploads/" + itemDetails.itemImg;
+        setPostValues(itemDetails)
+    }
+    
     //Input values to postValues
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -85,7 +100,7 @@ const Items = () => {
         let validationErrors = validateItemEntry(postValues);
         setErrorValues(validationErrors);
         if (Object.keys(validationErrors).length === 0)
-            insertItem();
+            postValues.itemID === "" ? insertItem() : updateItem();
     }
 
     //Posting form data to API
@@ -134,18 +149,67 @@ const Items = () => {
         handleShow();
     }
 
+    //Updating SP, CP, Description, preffered vendor
+    const updateItem = async () => {
+        let itemID = postValues.itemID;
+        console.log(itemID);
+        if (itemID === "")
+            return;
+        let sellingPrice = postValues.sellingPrice;
+        let costPrice = postValues.costPrice;
+        let descr = postValues.descr;
+        let reorderPoint = postValues.reorderPoint;
+        let prefVendor = postValues.prefVendor;
+        console.log(reorderPoint);
+        setLoading(true);
+        let data = {
+            sellingPrice, costPrice, descr, reorderPoint, prefVendor
+        };
+        let options = {
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': token
+            }
+        }
+        console.log(data);
+        const response = await axios.put(`/api/inventory/item/${itemID}/update`, data, options);
+        if (response.status === 401)
+            Logout();
+        if (response.data.status === "Success") {
+            setModalText({
+                header: "Item",
+                body: "Item successfully updated"
+            });
+            setPostValues(initValues);
+        } else {
+            setModalText({
+                header: "Error",
+                body: "An unexpected error occured. Please try again!" + response.data.message
+            });
+        }
+        setLoading(false);
+        handleShow();
+        fetchItemGroups();
+    }
+
     return (
         <Form className="mx-auto col-lg-6 col-md-8 col-sm-10 p-3 formBg" onSubmit={handleSubmit} encType="multipart/form-data">
             <div className="text-center fs-1 mb-1 formHead">INVENTORY ITEM</div>
+            <div className="d-flex flex-row align-items-baseline">
+                <Button variant="primary" onClick={() => setPostValues(initValues)}>New Item</Button>&emsp;
+                <Form.Label>Select Item</Form.Label>
+                <PickList title={plItems.title} rowHeaders={plItems.rowHeaders} search={plItems.search}
+                    data={plItems.data} onSelect={loadItemDetails} /> 
+            </div>
             <Row>
                 <Form.Group className="col-md-6 mb-3" controlId="formItemName">
                     <Form.Label>Item Name</Form.Label>
-                    <Form.Control type="text" name="itemName" value={postValues.itemName} onChange={handleChange} placeholder="Item Name" />
+                    <Form.Control type="text" name="itemName" value={postValues.itemName} onChange={handleChange} placeholder="Item Name" disabled={ postValues.itemID !== ""} />
                     <Form.Text className="text-danger">{errorValues.itemName}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6  mb-3" controlId="formItemGroup">
                     <Form.Label>Item Group</Form.Label>
-                    <Form.Select name="groupID" value={postValues.groupID} onChange={handleChange} >
+                    <Form.Select name="groupID" value={postValues.groupID} onChange={handleChange} disabled={ postValues.itemID !== ""} >
                         <option value="">--Select--</option>
                         {itemGroups.map(item => <option value={item.ID} key={item.ID}>{item["Group Name"]}</option>)}
                     </Form.Select>
@@ -153,27 +217,27 @@ const Items = () => {
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formUnit">
                     <Form.Label>Unit</Form.Label>
-                    <Form.Control type="text" name="unit" value={postValues.unit} onChange={handleChange} placeholder="Unit" />
+                    <Form.Control type="text" name="unit" value={postValues.unit} onChange={handleChange} placeholder="Unit" disabled={ postValues.itemID !== ""} />
                     <Form.Text className="text-danger">{errorValues.unit}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formDimensions">
                     <Form.Label>Dimensions</Form.Label>
-                    <Form.Control type="text" name="dimensions" value={postValues.dimensions} onChange={handleChange} placeholder="L x B x H" />
+                    <Form.Control type="text" name="dimensions" value={postValues.dimensions} onChange={handleChange} placeholder="L x B x H" disabled={ postValues.itemID !== ""} />
                     <Form.Text className="text-danger">{errorValues.dimensions}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formWeight">
                     <Form.Label>Weight</Form.Label>
-                    <Form.Control type="text" name="weight" value={postValues.weight} onChange={handleChange} placeholder="Weight" />
+                    <Form.Control type="text" name="weight" value={postValues.weight} onChange={handleChange} placeholder="Weight" disabled={ postValues.itemID !== ""} />
                     <Form.Text className="text-danger">{errorValues.weight}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formManufacturer">
                     <Form.Label>Manufacturer</Form.Label>
-                    <Form.Control type="text" name="manufacturer" value={postValues.manufacturer} onChange={handleChange} placeholder="Manufacturer" />
+                    <Form.Control type="text" name="manufacturer" value={postValues.manufacturer} onChange={handleChange} placeholder="Manufacturer" disabled={ postValues.itemID !== ""} />
                     <Form.Text className="text-danger">{errorValues.manufacturer}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formBrand">
                     <Form.Label>Brand</Form.Label>
-                    <Form.Control type="text" name="brand" value={postValues.brand} onChange={handleChange} placeholder="Brand" />
+                    <Form.Control type="text" name="brand" value={postValues.brand} onChange={handleChange} placeholder="Brand" disabled={ postValues.itemID !== ""} />
                     <Form.Text className="text-danger">{errorValues.brand}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formDescr">
@@ -193,7 +257,7 @@ const Items = () => {
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formOpeningStock">
                     <Form.Label>Opening Stock</Form.Label>
-                    <Form.Control type="number" name="openingStock" value={postValues.openingStock} onChange={handleChange} placeholder="Opening Stock" />
+                    <Form.Control type="number" name="openingStock" value={postValues.openingStock} onChange={handleChange} placeholder="Opening Stock" disabled={ postValues.itemID !== ""} />
                     <Form.Text className="text-danger">{errorValues.openingStock}</Form.Text>
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formReorderPoint">
@@ -208,7 +272,7 @@ const Items = () => {
                 </Form.Group>
                 <Form.Group className="col-md-6 mb-3" controlId="formItemImg">
                     <Form.Label>Item Image</Form.Label>
-                    <Form.Control type="file" name="itemImg" onChange={handleFileChange} accept="image/*" />
+                    <Form.Control type="file" name="itemImg" onChange={handleFileChange} accept="image/*" disabled={ postValues.itemID !== ""} />
                     <Form.Text className="text-danger">{errorValues.itemImg}</Form.Text>
                     {postValues.filepreview !== null ?
                         <img className="img-fluid" src={postValues.filepreview} alt="Item" />

@@ -3,13 +3,15 @@ const path = require("path");
 const auth = require("../helpers/auth");
 const {
     insertItemGroup,
-    getItemGroups
+    getItemGroups,
+    updateItemGroup
 } = require("../controller/itemGrpController");
 const {
     insertItem,
     getItem,
     getAllItems,
-    getItemStockOnHand
+    getItemStockOnHand,
+    updateItem
 } = require("../controller/itemController");
 const {
     insertInvAdj,
@@ -35,10 +37,12 @@ var upload = multer({ storage: storage });
 
 //Item Groups
 inventoryRouter.post("/item-group", auth, (req, res) => insertItemGroup(req, res));
+inventoryRouter.put("/item-group/:id/update", auth, (req, res) => updateItemGroup(req, res));
 inventoryRouter.get("/item-groups/:id", auth, async (req, res) => getItemGroups(req, res));
 
 //Items
 inventoryRouter.post("/item", auth, upload.single('itemImg'), (req, res) => insertItem(req, res));
+inventoryRouter.put("/item/:id/update", auth, (req, res) => updateItem(req, res));
 inventoryRouter.get("/item/:id", auth, async (req, res) => getItem(req, res));
 inventoryRouter.get("/allitems4group/:id", auth, async (req, res) => getAllItems(req, res));
 inventoryRouter.get("/item-stock/:id", auth, async (req, res) => getItemStockOnHand(req, res));

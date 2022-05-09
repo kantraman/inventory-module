@@ -1,18 +1,23 @@
 const express = require("express"); 
 const {
-    signupAdmin,
-    adminLogin
+    signupUser,
+    adminLogin,
+    isAdmin
 } = require("../controller/userAccountsController");
 const accountsRouter = express.Router();
+const auth = require("../helpers/auth");
 
-
-accountsRouter.post("/signup", async (req, res) => {
-    signupAdmin(req, res);
+accountsRouter.post("/signup", auth, async (req, res) => {
+    signupUser(req, res);
 });
 
 accountsRouter.post("/login", async (req, res) => {
     adminLogin(req, res);
 });
+
+accountsRouter.get("/is-admin", auth, (req, res) => {
+    isAdmin(req, res);
+})
 
 
 module.exports = accountsRouter;

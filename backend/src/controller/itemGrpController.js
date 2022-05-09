@@ -27,6 +27,32 @@ const insertItemGroup = (req, res) => {
     }
 };
 
+//Update item group
+const updateItemGroup = (req, res) => {
+    try {
+        let groupID = req.params.id;
+       
+        var updateItem = {
+            groupName: req.body.groupName,
+            tax: req.body.tax
+        };
+       
+        if (groupID !== undefined && groupID !== "") {
+            ItemGroup.findOneAndUpdate({ groupID: groupID }, updateItem, null)
+                .then(res.json({status: "Success"}))
+                .catch((er) => {
+                    if (!res.headersSent)
+                        res.sendStatus(500).json({ status: "Error" });
+                });
+        } else {
+            res.json({ status: "Error", message: "Invalid inputs" });
+        }
+    } catch (error) {
+        if (!res.headersSent)
+            res.json({ status: "Error", message: error.message });
+    }
+}
+
 //Get Item Groups
 const getItemGroups = async (req, res) => {
     try {
@@ -55,5 +81,6 @@ const getItemGroups = async (req, res) => {
 
 module.exports = {
     insertItemGroup,
-    getItemGroups
+    getItemGroups,
+    updateItemGroup
 };

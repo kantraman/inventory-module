@@ -1,8 +1,7 @@
 const Logout = () => {
-    
     localStorage.clear();
-    window.location.href = "/";
-
+    let loginUrl = window.location.origin;
+    window.location.href = loginUrl;
 };
 
 export default Logout;
